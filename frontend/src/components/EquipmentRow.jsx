@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import AlertCountBadge from "./AlertCountBadge";
 import MetricValue from "./MetricValue";
@@ -11,6 +11,7 @@ export default function EquipmentRow({
   canEdit = false,
   onSelect,
   onEdit,
+  onDelete,
 }) {
   const isTelemetryPaused =
     item.status === "Faulty" ||
@@ -60,14 +61,24 @@ export default function EquipmentRow({
         onClick={(e) => e.stopPropagation()}
       >
         {canEdit && (
-          <button
-            type="button"
-            onClick={() => onEdit(item)}
-            aria-label={`Edit ${item.name}`}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-navy transition-all"
-          >
-            <Pencil size={16} />
-          </button>
+          <div className="flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={() => onEdit(item)}
+              aria-label={`Edit ${item.name}`}
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-navy transition-all"
+            >
+              <Pencil size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(item)}
+              aria-label={`Delete ${item.name}`}
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-all"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         )}
       </td>
     </tr>

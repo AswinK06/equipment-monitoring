@@ -116,6 +116,8 @@ All endpoints except authentication and health checks require an `Authorization:
 | PATCH | `/api/alerts/{id}/resolve` | Admin | Updates alert lifecycle status to Resolved. |
 | GET | `/health` | Anonymous | Service health probe returning operational status. |
 
+Deleting equipment also deletes its readings, alerts and thresholds.
+
 Standard error responses follow RFC 7807 ProblemDetails specification (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404 Not Found, 409 Conflict).
 
 ## MQTT Telemetry Format

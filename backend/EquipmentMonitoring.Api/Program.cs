@@ -39,7 +39,8 @@ builder.Services.AddAuthRateLimiting();
 
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
-builder.Services.AddScoped<IReadingService, ReadingService>();
+builder.Services.AddScoped<IReadingIngestionService, ReadingIngestionService>();
+builder.Services.AddScoped<IReadingQueryService, ReadingQueryService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

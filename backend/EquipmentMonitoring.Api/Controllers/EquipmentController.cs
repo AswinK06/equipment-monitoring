@@ -1,6 +1,5 @@
 using EquipmentMonitoring.Api.Constants;
 using EquipmentMonitoring.Api.Dtos;
-using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,8 @@ namespace EquipmentMonitoring.Api.Controllers;
 [ApiController, Route("api/equipment"), Authorize]
 public class EquipmentController(
     IEquipmentService equipment,
-    IReadingService readings,
+    IReadingQueryService readingQuery,
+    IReadingIngestionService readingIngestion,
     IAlertService alerts
 ) : ControllerBase
 {
@@ -52,11 +52,11 @@ public class EquipmentController(
         [FromQuery] string? metric,
         [FromQuery] int limit = 200,
         CancellationToken ct = default
-    ) => Ok(await readings.HistoryAsync(id, from, to, metric, limit, ct));
+    ) => Ok(await readingQuery.HistoryAsync(id, from, to, metric, limit, ct));
 
     [HttpPost("{id:int}/readings"), Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<IngestResult>> Ingest(int id, IngestRequest request, CancellationToken ct) =>
-        Accepted(await readings.IngestAsync(id, request, ct));
+        Accepted(await readingIngestion.IngestAsync(id, request, ct));
 
     [HttpGet("{id:int}/alerts")]
     public async Task<ActionResult<IReadOnlyList<AlertDto>>> AlertHistory(int id, CancellationToken ct) =>

@@ -10,7 +10,7 @@ using Xunit;
 
 namespace EquipmentMonitoring.Tests;
 
-public class ReadingServiceTests
+public class ReadingIngestionServiceTests
 {
     private class FakeNotifier : IRealtimeNotifier
     {
@@ -78,7 +78,7 @@ public class ReadingServiceTests
     {
         using var db = CreateContext();
         var notifier = new FakeNotifier();
-        var service = new ReadingService(db, notifier, new NullCacheService());
+        var service = new ReadingIngestionService(db, notifier, new NullCacheService());
 
         var req = new IngestRequest
         {
@@ -101,7 +101,7 @@ public class ReadingServiceTests
     {
         using var db = CreateContext();
         var notifier = new FakeNotifier();
-        var service = new ReadingService(db, notifier, new NullCacheService());
+        var service = new ReadingIngestionService(db, notifier, new NullCacheService());
 
         var req1 = new IngestRequest
         {
@@ -132,7 +132,7 @@ public class ReadingServiceTests
     {
         using var db = CreateContext();
         var notifier = new FakeNotifier();
-        var service = new ReadingService(db, notifier, new NullCacheService());
+        var service = new ReadingIngestionService(db, notifier, new NullCacheService());
         var alertService = new AlertService(db, notifier, new NullCacheService());
 
         var req1 = new IngestRequest
@@ -166,7 +166,7 @@ public class ReadingServiceTests
     public async Task Ingest_UnknownEquipment_ThrowsNotFoundException()
     {
         using var db = CreateContext();
-        var service = new ReadingService(db, new FakeNotifier(), new NullCacheService());
+        var service = new ReadingIngestionService(db, new FakeNotifier(), new NullCacheService());
 
         var req = new IngestRequest
         {
@@ -179,6 +179,51 @@ public class ReadingServiceTests
 
         await Assert.ThrowsAsync<NotFoundException>(() =>
             service.IngestAsync(999, req, CancellationToken.None)
+        );
+    }
+
+    [Fact]
+    public async Task History_Returns_Readings_In_Chronological_Order()
+    {
+        using var db = CreateContext();
+        var queryService = new ReadingQueryService(db);
+        var now = DateTime.UtcNow;
+
+        db.Readings.AddRange(
+            new Reading { EquipmentId = 1, Metric = "temperature", Value = 60, Timestamp = now.AddMinutes(-10) },
+            new Reading { EquipmentId = 1, Metric = "temperature", Value = 70, Timestamp = now.AddMinutes(-5) },
+            new Reading { EquipmentId = 1, Metric = "temperature", Value = 80, Timestamp = now }
+        );
+        await db.SaveChangesAsync();
+
+        var result = await queryService.HistoryAsync(1, null, null, null, 100, CancellationToken.None);
+
+        Assert.Equal(3, result.Count);
+        Assert.Equal(60, result[0].Value);
+        Assert.Equal(70, result[1].Value);
+        Assert.Equal(80, result[2].Value);
+    }
+
+    [Fact]
+    public async Task History_ThrowsNotFound_When_Equipment_Missing()
+    {
+        using var db = CreateContext();
+        var queryService = new ReadingQueryService(db);
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            queryService.HistoryAsync(999, null, null, null, 100, CancellationToken.None)
+        );
+    }
+
+    [Fact]
+    public async Task History_ThrowsBadRequest_When_From_After_To()
+    {
+        using var db = CreateContext();
+        var queryService = new ReadingQueryService(db);
+        var now = DateTime.UtcNow;
+
+        await Assert.ThrowsAsync<BadRequestException>(() =>
+            queryService.HistoryAsync(1, now, now.AddMinutes(-5), null, 100, CancellationToken.None)
         );
     }
 }

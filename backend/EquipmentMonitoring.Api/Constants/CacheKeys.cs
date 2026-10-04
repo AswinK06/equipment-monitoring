@@ -1,4 +1,4 @@
-namespace EquipmentMonitoring.Api.Services;
+namespace EquipmentMonitoring.Api.Constants;
 
 public static class CacheKeys
 {

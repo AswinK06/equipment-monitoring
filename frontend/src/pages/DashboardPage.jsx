@@ -3,12 +3,14 @@ import { Plus, Search } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useAuth } from "../hooks/useAuth";
+import { useDeleteEquipment } from "../hooks/useDeleteEquipment";
 import { isAdmin } from "../utils/roles";
 import PageHeader from "../components/PageHeader";
 import StatCard from "../components/StatCard";
 import Card from "../components/Card";
 import EquipmentTable from "../components/EquipmentTable";
 import EquipmentForm from "../components/EquipmentForm";
+import ConfirmDialog from "../components/ConfirmDialog";
 import Button from "../components/Button";
 import { STATUSES, STATUS_COLORS } from "../constants/statuses";
 import { selectAllEquipment, selectStatusCounts, saveEquipment } from "../store/slices/equipmentSlice";
@@ -19,6 +21,7 @@ export default function DashboardPage({ onSelect, onSave }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { target, deleting, error, requestDelete, cancelDelete, confirmDelete } = useDeleteEquipment();
 
   const [modalItem, setModalItem] = useState(undefined); // undefined: closed, null: new, obj: edit
 
@@ -161,6 +164,7 @@ export default function DashboardPage({ onSelect, onSave }) {
           activeAlerts={activeAlerts}
           onSelect={handleSelectEquipment}
           onEdit={(item) => setModalItem(item)}
+          onDelete={requestDelete}
           emptyMessage={
             equipment.length === 0
               ? "No equipment registered yet."
@@ -187,6 +191,17 @@ export default function DashboardPage({ onSelect, onSave }) {
           item={modalItem}
           onClose={() => setModalItem(undefined)}
           onSave={handleSaveEquipment}
+        />
+      )}
+
+      {target && canEdit && (
+        <ConfirmDialog
+          title="Delete equipment"
+          message={`Delete "${target.name}"? Its readings and alert history will also be permanently removed. This cannot be undone.`}
+          loading={deleting}
+          error={error}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
         />
       )}
     </div>

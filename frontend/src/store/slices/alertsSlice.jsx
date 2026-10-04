@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getAlerts, acknowledgeAlert as apiAcknowledgeAlert, resolveAlert as apiResolveAlert } from "../../api/alertsApi";
+import { removeEquipment } from "./equipmentSlice";
 import { formatTime } from "../../utils/format";
 
 export const toAlert = (a) => ({
@@ -99,6 +100,9 @@ const alertsSlice = createSlice({
       })
       .addCase(resolveAlert.rejected, (state, action) => {
         state.error = action.payload || action.error.message;
+      })
+      .addCase(removeEquipment.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.equipmentId !== action.payload);
       });
   },
 });

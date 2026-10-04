@@ -9,6 +9,7 @@ export default function EquipmentTable({
   activeAlerts = [],
   onSelect,
   onEdit,
+  onDelete,
   emptyMessage,
   emptyAction,
   bordered = false,
@@ -58,6 +59,7 @@ export default function EquipmentTable({
                 canEdit={canEdit}
                 onSelect={onSelect}
                 onEdit={onEdit}
+                onDelete={onDelete}
               />
             );
           })}

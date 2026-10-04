@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { getReadings } from "../../api/equipmentApi";
+import { removeEquipment } from "./equipmentSlice";
 import { rowsFromHistory, addSample } from "../../utils/readings";
 
 export const fetchReadings = createAsyncThunk(
@@ -47,6 +48,9 @@ const readingsSlice = createSlice({
       })
       .addCase(fetchReadings.rejected, (state, action) => {
         state.error = action.payload || action.error.message;
+      })
+      .addCase(removeEquipment.fulfilled, (state, action) => {
+        delete state.byEquipmentId[action.payload];
       });
   },
 });

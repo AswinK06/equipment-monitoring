@@ -1,5 +1,5 @@
 using EquipmentMonitoring.Api.Enums;
-using EquipmentMonitoring.Api.Services;
+using EquipmentMonitoring.Api.Rules;
 using Xunit;
 
 namespace EquipmentMonitoring.Tests;

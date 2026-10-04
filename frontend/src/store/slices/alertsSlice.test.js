@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import alertsReducer, { alertReceived, alertUpdated } from "./alertsSlice";
+import { removeEquipment } from "./equipmentSlice";
 
 describe("alertsSlice reducer", () => {
   it("alertReceived adds an alert", () => {
@@ -32,5 +33,23 @@ describe("alertsSlice reducer", () => {
 
     expect(state.items).toHaveLength(1);
     expect(state.items[0].status).toBe("Acknowledged");
+  });
+
+  it("removeEquipment.fulfilled removes only that machine's alerts", () => {
+    const initialState = {
+      items: [
+        { id: 1, equipmentId: 10, status: "Open" },
+        { id: 2, equipmentId: 20, status: "Open" },
+        { id: 3, equipmentId: 10, status: "Acknowledged" },
+      ],
+      loading: false,
+      error: null,
+    };
+
+    const state = alertsReducer(initialState, removeEquipment.fulfilled(10, "req-1", 10));
+
+    expect(state.items).toHaveLength(1);
+    expect(state.items[0].id).toBe(2);
+    expect(state.items[0].equipmentId).toBe(20);
   });
 });

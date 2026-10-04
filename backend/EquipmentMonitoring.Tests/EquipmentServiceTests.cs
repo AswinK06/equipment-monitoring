@@ -1,3 +1,4 @@
+using EquipmentMonitoring.Api.Constants;
 using EquipmentMonitoring.Api.Data;
 using EquipmentMonitoring.Api.Dtos;
 using EquipmentMonitoring.Api.Enums;
@@ -12,11 +13,17 @@ namespace EquipmentMonitoring.Tests;
 
 public class EquipmentServiceTests
 {
-    private class NullCacheService : ICacheService
+    private class RecordingCacheService : ICacheService
     {
+        public List<string> RemovedKeys { get; } = new();
+
         public Task<T?> GetAsync<T>(string key) => Task.FromResult<T?>(default);
         public Task SetAsync<T>(string key, T value, TimeSpan ttl) => Task.CompletedTask;
-        public Task RemoveAsync(string key) => Task.CompletedTask;
+        public Task RemoveAsync(string key)
+        {
+            RemovedKeys.Add(key);
+            return Task.CompletedTask;
+        }
     }
 
     private static AppDbContext CreateContext()
@@ -67,7 +74,7 @@ public class EquipmentServiceTests
         db.Equipment.AddRange(eqOld, eqNewest, eqMid);
         await db.SaveChangesAsync();
 
-        var service = new EquipmentService(db, new NullCacheService());
+        var service = new EquipmentService(db, new RecordingCacheService());
         var result = await service.ListAsync(CancellationToken.None);
 
         Assert.Equal(3, result.Count);
@@ -106,7 +113,7 @@ public class EquipmentServiceTests
         db.Equipment.AddRange(eq10, eq5);
         await db.SaveChangesAsync();
 
-        var service = new EquipmentService(db, new NullCacheService());
+        var service = new EquipmentService(db, new RecordingCacheService());
         var result = await service.ListAsync(CancellationToken.None);
 
         Assert.Equal(2, result.Count);
@@ -135,7 +142,7 @@ public class EquipmentServiceTests
         await db.SaveChangesAsync();
 
         var beforeTime = eq.UpdatedAt;
-        var service = new EquipmentService(db, new NullCacheService());
+        var service = new EquipmentService(db, new RecordingCacheService());
 
         var updateRequest = new EquipmentRequest
         {
@@ -155,5 +162,45 @@ public class EquipmentServiceTests
         Assert.NotNull(entityInDb);
         Assert.True(entityInDb.UpdatedAt > beforeTime);
         Assert.Equal(updatedDto.UpdatedAt, entityInDb.UpdatedAt);
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WithUnknownId_ThrowsNotFoundException()
+    {
+        using var db = CreateContext();
+        var service = new EquipmentService(db, new RecordingCacheService());
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            service.DeleteAsync(999, CancellationToken.None)
+        );
+    }
+
+    [Fact]
+    public async Task DeleteAsync_WithExistingId_RemovesEquipment()
+    {
+        using var db = CreateContext();
+        var cache = new RecordingCacheService();
+        var service = new EquipmentService(db, cache);
+
+        var eq = new Equipment
+        {
+            Id = 1,
+            Name = "Equipment 1",
+            Type = "Pump",
+            Location = "Bay 1",
+            Status = EquipmentStatus.Active,
+            InstalledDate = new DateOnly(2022, 1, 1),
+            UpdatedAt = DateTime.UtcNow
+        };
+        db.Equipment.Add(eq);
+        await db.SaveChangesAsync();
+
+        await service.DeleteAsync(1, CancellationToken.None);
+
+        var entity = await db.Equipment.FindAsync(1);
+        Assert.Null(entity);
+        Assert.Contains(CacheKeys.EquipmentById(1), cache.RemovedKeys);
+        Assert.Contains(CacheKeys.EquipmentList, cache.RemovedKeys);
+        Assert.Contains(CacheKeys.DashboardSummary, cache.RemovedKeys);
     }
 }

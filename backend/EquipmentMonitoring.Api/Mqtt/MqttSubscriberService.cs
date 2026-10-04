@@ -1,5 +1,3 @@
-using System.Text.Json;
-using EquipmentMonitoring.Api.Dtos;
 using EquipmentMonitoring.Api.Exceptions;
 using EquipmentMonitoring.Api.Services.Interfaces;
 using Microsoft.Extensions.Options;
@@ -14,8 +12,6 @@ public class MqttSubscriberService(
     ILogger<MqttSubscriberService> log
 ) : BackgroundService
 {
-    private static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true };
-
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         var o = options.Value;
@@ -80,26 +76,20 @@ public class MqttSubscriberService(
 
         try
         {
-            var parts = e.ApplicationMessage.Topic.Split('/');
-            if (parts.Length != 3 || !int.TryParse(parts[1], out var equipmentId))
-            {
-                log.LogWarning("Ignoring message on unexpected topic {Topic}", e.ApplicationMessage.Topic);
-                return;
-            }
+            var topic = e.ApplicationMessage.Topic;
+            var payload = e.ApplicationMessage.ConvertPayloadToString();
 
-            var payloadString = e.ApplicationMessage.ConvertPayloadToString();
-            var request = JsonSerializer.Deserialize<IngestRequest>(payloadString, Json);
-            if (request is null || request.Readings.Count == 0 || request.Readings.Any(r => r.Value is null || string.IsNullOrWhiteSpace(r.Metric)))
+            if (!MqttMessageParser.TryParse(topic, payload, out var equipmentId, out var request))
             {
-                log.LogWarning("Ignoring invalid payload on {Topic}", e.ApplicationMessage.Topic);
+                log.LogWarning("Ignoring invalid MQTT message on {Topic}", topic);
                 return;
             }
 
             if (ct.IsCancellationRequested) return;
 
             using var scope = scopes.CreateScope();
-            var readingService = scope.ServiceProvider.GetRequiredService<IReadingService>();
-            await readingService.IngestAsync(equipmentId, request, ct);
+            var readingService = scope.ServiceProvider.GetRequiredService<IReadingIngestionService>();
+            await readingService.IngestAsync(equipmentId, request!, ct);
         }
         catch (OperationCanceledException)
         {

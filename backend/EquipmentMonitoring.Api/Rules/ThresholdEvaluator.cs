@@ -1,6 +1,6 @@
 using EquipmentMonitoring.Api.Enums;
 
-namespace EquipmentMonitoring.Api.Services;
+namespace EquipmentMonitoring.Api.Rules;
 
 // Rule: strictly above Max or strictly below Min is a breach. Equal to a limit is safe.
 public static class ThresholdEvaluator

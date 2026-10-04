@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
-import { getEquipment, createEquipment, updateEquipment } from "../../api/equipmentApi";
+import { getEquipment, createEquipment, updateEquipment, deleteEquipment } from "../../api/equipmentApi";
 import { STATUSES } from "../../constants/statuses";
 
 export const toEquipment = (e) => ({
@@ -43,6 +43,14 @@ export const saveEquipment = createAsyncThunk(
   }
 );
 
+export const removeEquipment = createAsyncThunk(
+  "equipment/remove",
+  async (id) => {
+    await deleteEquipment(id);
+    return id;
+  }
+);
+
 const initialState = {
   items: [],
   loading: false,
@@ -81,6 +89,9 @@ const equipmentSlice = createSlice({
       })
       .addCase(saveEquipment.rejected, (state, action) => {
         state.error = action.payload || action.error.message;
+      })
+      .addCase(removeEquipment.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.id !== action.payload);
       });
   },
 });

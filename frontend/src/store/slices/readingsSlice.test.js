@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import readingsReducer, { readingsReceived } from "./readingsSlice";
+import { removeEquipment } from "./equipmentSlice";
 
 describe("readingsSlice reducer", () => {
   it("readingsReceived adds a row, and after 70 calls only 60 rows remain", () => {
@@ -28,5 +29,20 @@ describe("readingsSlice reducer", () => {
     }
 
     expect(state.byEquipmentId[1]).toHaveLength(60);
+  });
+
+  it("removeEquipment.fulfilled removes that machine's readings", () => {
+    const initialState = {
+      byEquipmentId: {
+        1: [{ timestamp: "2026-10-04T10:00:00Z", temperature: 50 }],
+        2: [{ timestamp: "2026-10-04T10:00:00Z", temperature: 60 }],
+      },
+      error: null,
+    };
+
+    const state = readingsReducer(initialState, removeEquipment.fulfilled(1, "req-1", 1));
+
+    expect(state.byEquipmentId[1]).toBeUndefined();
+    expect(state.byEquipmentId[2]).toBeDefined();
   });
 });

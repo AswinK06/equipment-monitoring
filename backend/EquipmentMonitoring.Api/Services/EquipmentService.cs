@@ -1,3 +1,4 @@
+using EquipmentMonitoring.Api.Constants;
 using EquipmentMonitoring.Api.Data;
 using EquipmentMonitoring.Api.Dtos;
 using EquipmentMonitoring.Api.Exceptions;
@@ -70,7 +71,7 @@ public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipment
 
     private async Task<Equipment> FindAsync(int id, CancellationToken ct) =>
         await db.Equipment.FirstOrDefaultAsync(e => e.Id == id, ct)
-        ?? throw new NotFoundException($"Equipment {id} was not found.");
+            ?? throw new NotFoundException($"Equipment {id} was not found.");
 
     private static void Apply(Equipment e, EquipmentRequest r)
     {

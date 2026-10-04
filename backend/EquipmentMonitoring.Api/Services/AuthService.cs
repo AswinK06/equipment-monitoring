@@ -15,7 +15,7 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
     public async Task<LoginResponse> LoginAsync(string email, string password, CancellationToken ct)
     {
         var normalizedEmail = email.Trim().ToLowerInvariant();
-        var user = await db.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail, ct);
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail, ct);
 
         if (user is null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
         {
@@ -28,7 +28,7 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
     public async Task<LoginResponse> RegisterAsync(RegisterRequest request, CancellationToken ct)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var exists = await db.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail, ct);
+        var exists = await db.Users.AnyAsync(u => u.Email == normalizedEmail, ct);
         if (exists)
         {
             throw new ConflictException("An account with this email already exists.");
@@ -43,7 +43,14 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         };
 
         db.Users.Add(user);
-        await db.SaveChangesAsync(ct);
+        try
+        {
+            await db.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateException)
+        {
+            throw new ConflictException("An account with this email already exists.");
+        }
 
         return BuildLoginResponse(user);
     }
