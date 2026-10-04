@@ -1,4 +1,5 @@
-using EquipmentMonitoring.Api.Domain;
+using EquipmentMonitoring.Api.Enums;
+using EquipmentMonitoring.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Data;
@@ -18,12 +19,14 @@ public static class DbSeeder
             new Equipment { Name = "Hydraulic Pump #2", Type = "Pump", Location = "Plant 1 · Bay 4", Status = EquipmentStatus.Active, InstalledDate = new(2022, 7, 2) },
             new Equipment { Name = "Compressor C-7", Type = "Compressor", Location = "Plant 2 · Utility", Status = EquipmentStatus.Active, InstalledDate = new(2020, 11, 23) },
             new Equipment { Name = "Turbine T-1", Type = "Turbine", Location = "Plant 2 · Hall A", Status = EquipmentStatus.Idle, InstalledDate = new(2019, 5, 30) },
-            new Equipment { Name = "Cooling Fan F-3", Type = "Fan", Location = "Plant 1 · Roof", Status = EquipmentStatus.UnderMaintenance, InstalledDate = new(2023, 1, 18) });
+            new Equipment { Name = "Cooling Fan F-3", Type = "Fan", Location = "Plant 1 · Roof", Status = EquipmentStatus.UnderMaintenance, InstalledDate = new(2023, 1, 18) }
+        );
 
         db.Thresholds.AddRange(
             new Threshold { Metric = "temperature", Max = 85 },
             new Threshold { Metric = "vibration", Max = 7 },
-            new Threshold { Metric = "pressure", Min = 30, Max = 120 });
+            new Threshold { Metric = "pressure", Min = 30, Max = 120 }
+        );
 
         await db.SaveChangesAsync();
     }

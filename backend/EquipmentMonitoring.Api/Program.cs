@@ -1,8 +1,10 @@
 using System.Text.Json.Serialization;
 using EquipmentMonitoring.Api.Data;
 using EquipmentMonitoring.Api.Hubs;
+using EquipmentMonitoring.Api.Middleware;
 using EquipmentMonitoring.Api.Mqtt;
 using EquipmentMonitoring.Api.Services;
+using EquipmentMonitoring.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,7 +36,9 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
+{
     await DbSeeder.InitAsync(scope.ServiceProvider.GetRequiredService<AppDbContext>());
+}
 
 app.UseExceptionHandler();
 app.UseCors();

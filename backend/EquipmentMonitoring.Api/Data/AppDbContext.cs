@@ -1,4 +1,4 @@
-using EquipmentMonitoring.Api.Domain;
+using EquipmentMonitoring.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Data;
@@ -19,6 +19,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Location).HasMaxLength(120).IsRequired();
             e.Property(x => x.Status).HasConversion<string>().HasMaxLength(30);
         });
+
         b.Entity<Reading>(e =>
         {
             e.Property(x => x.Metric).HasMaxLength(40).IsRequired();
@@ -26,6 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.EquipmentId, x.Timestamp });
             e.HasOne<Equipment>().WithMany(x => x.Readings).HasForeignKey(x => x.EquipmentId).OnDelete(DeleteBehavior.Cascade);
         });
+
         b.Entity<Alert>(e =>
         {
             e.Property(x => x.Metric).HasMaxLength(40).IsRequired();
@@ -34,6 +36,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => new { x.EquipmentId, x.Status });
             e.HasOne<Equipment>().WithMany(x => x.Alerts).HasForeignKey(x => x.EquipmentId).OnDelete(DeleteBehavior.Cascade);
         });
+
         b.Entity<Threshold>(e =>
         {
             e.Property(x => x.Metric).HasMaxLength(40).IsRequired();

@@ -1,8 +1,6 @@
-using EquipmentMonitoring.Api.Domain;
+using EquipmentMonitoring.Api.Enums;
 
 namespace EquipmentMonitoring.Api.Services;
-
-public record Breach(BreachKind Kind, double Limit);
 
 /// <summary>Pure alert rule: strictly above Max or strictly below Min is a breach. Equal to a limit is safe.</summary>
 public static class ThresholdEvaluator
