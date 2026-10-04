@@ -1,20 +1,17 @@
 import { useState } from "react";
-import { useEquipmentHub } from "../lib/useEquipmentHub";
+import { useEquipmentData } from "../hooks/useEquipmentData";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from "recharts";
 import { Activity, Bell, Plus, Pencil, X, ArrowLeft, Check, Radio, LayoutGrid } from "lucide-react";
+import { LIMITS, UNITS, METRIC_NAMES as METRICS } from "../constants/metrics";
+import { STATUSES, STATUS_COLORS as ST_COLORS } from "../constants/statuses";
+import { formatNumber as fmt } from "../utils/format";
 
-/* ---------- constants ---------- */
-const LIMITS = { temperature: 85, vibration: 7, pressure: 120 };
-const UNITS = { temperature: "°C", vibration: "mm/s", pressure: "psi", runtime: "h" };
-const METRICS = ["temperature", "vibration", "pressure", "runtime"];
-const STATUSES = ["Active", "Idle", "Faulty", "Under Maintenance"];
 const ST = {
-  Active: ["bg-emerald-500", "bg-emerald-50 text-emerald-800 ring-emerald-200"],
-  Idle: ["bg-slate-400", "bg-slate-100 text-slate-700 ring-slate-300"],
-  Faulty: ["bg-red-500", "bg-red-50 text-red-800 ring-red-200"],
-  "Under Maintenance": ["bg-amber-500", "bg-amber-50 text-amber-800 ring-amber-200"],
+  Active: [ST_COLORS.Active.dot, ST_COLORS.Active.badge],
+  Idle: [ST_COLORS.Idle.dot, ST_COLORS.Idle.badge],
+  Faulty: [ST_COLORS.Faulty.dot, ST_COLORS.Faulty.badge],
+  "Under Maintenance": [ST_COLORS["Under Maintenance"].dot, ST_COLORS["Under Maintenance"].badge],
 };
-const fmt = (v) => (v == null ? "—" : Number(v).toFixed(1));
 
 /* ---------- small pieces ---------- */
 const Chip = ({ s }) => (
@@ -239,7 +236,7 @@ function FormModal({ item, onClose, onSave }) {
 
 /* ---------- app shell ---------- */
 export default function EquipmentDashboard() {
-  const { db, live, loading, error, setAlert, save } = useEquipmentHub();
+  const { db, live, loading, error, setAlert, save } = useEquipmentData();
   const [view, setView] = useState({ name: "dash" });
   const [modal, setModal] = useState(null); // null | {item}
   const open = db.alerts.filter((a) => a.status !== "Resolved");
