@@ -26,7 +26,7 @@ An industrial IoT telemetry monitoring and alert management platform. It ingests
 ## What to Install
 
 - .NET 8 SDK: Version 8.0 or later.
-- Node.js: Version 20 LTS or later (with npm).
+- Node.js: Version 22 LTS or later (with npm).
 - PostgreSQL: Version 16 or later (listening on port 5432).
 - Mosquitto MQTT Broker: Version 2.0 or later (listening on port 1883).
 - Redis (Optional): Version 6 or later (listening on port 6379).
