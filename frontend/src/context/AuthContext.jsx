@@ -41,14 +41,9 @@ export function AuthProvider({ children }) {
     if (!expiresAt || !token) return;
 
     const remainingMs = new Date(expiresAt).getTime() - Date.now();
-    if (remainingMs <= 0) {
-      logout("Your session expired. Please sign in again.");
-      return;
-    }
-
     const timer = setTimeout(() => {
       logout("Your session expired. Please sign in again.");
-    }, remainingMs);
+    }, Math.max(0, remainingMs));
 
     return () => clearTimeout(timer);
   }, [token, logout]);

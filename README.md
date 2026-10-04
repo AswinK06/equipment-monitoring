@@ -82,6 +82,20 @@ The following configuration settings are defined in `backend/EquipmentMonitoring
 | `Seed:AdminPassword` | `AdminPassword123!` | Initial password seeded for the default Administrator account. |
 | `Seed:ViewerPassword` | `ViewerPassword123!` | Initial password seeded for the default Viewer account. |
 
+### Simulator Environment Variables
+
+The IoT simulator (`simulator/simulator.js`) supports the following environment variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `MQTT_URL` | `mqtt://localhost:1883` | Mosquitto broker connection URL. |
+| `API_BASE` | `http://localhost:5000` | Backend REST API base URL. |
+| `AUTO_DISCOVER` | `false` | When `true`, automatically syncs monitored inventory from API. |
+| `SIM_EMAIL` | — | User email for API inventory polling when `AUTO_DISCOVER=true`. |
+| `SIM_PASSWORD` | — | User password for API inventory polling when `AUTO_DISCOVER=true`. |
+| `INTERVAL_MS` | `2000` | Telemetry broadcast interval in milliseconds. |
+| `EQUIPMENT_IDS`| `1,2,3,4` | Fallback equipment IDs when auto-discovery is disabled. |
+
 ## Demo Accounts
 
 The database automatically seeds two default accounts with distinct authorization levels:
@@ -147,45 +161,74 @@ Threshold rules are evaluated deterministically by `ThresholdEvaluator`:
 
 ```
 equipment-monitoring/
+|-- .github/
+|   `-- workflows/
+|       `-- ci.yml                # GitHub Actions CI workflow (backend & frontend)
+|-- .editorconfig                 # Multi-language editor formatting rules
+|-- .gitattributes                # Consistent line ending normalisation
 |-- backend/
 |   |-- EquipmentMonitoring.sln
 |   |-- EquipmentMonitoring.Api/
+|   |   |-- Constants/            # Domain role, cache, and policy constants
 |   |   |-- Controllers/          # REST API HTTP endpoints
 |   |   |-- Data/                 # EF Core DbContext, Seeder, Entity configurations
 |   |   |-- Dtos/                 # Data transfer records and request payloads
 |   |   |-- Enums/                # Domain enumeration definitions
 |   |   |-- Exceptions/           # Domain exception classes
+|   |   |-- Extensions/           # Service registration and configuration helpers
+|   |   |-- Helpers/              # Date/time and utility extension methods
 |   |   |-- Hubs/                 # SignalR hub and real-time notifier implementations
 |   |   |-- Mappings/             # Entity-to-DTO conversion extension methods
 |   |   |-- Middleware/           # Global exception handling and problem details
 |   |   |-- Migrations/           # EF Core database schema migrations
 |   |   |-- Models/               # Persistent database entity models
-|   |   |-- Mqtt/                 # MQTT client service and options
-|   |   |-- Services/             # Business logic and caching implementations
+|   |   |-- Mqtt/                 # MQTT client service, parser, and options
+|   |   |-- Rules/                # Telemetry breach and threshold evaluator rules
+|   |   |-- Services/             # Ingestion, query, auth, cache implementations
 |   |   |-- appsettings.json
 |   |   `-- Program.cs
 |   `-- EquipmentMonitoring.Tests/ # xUnit test suites and test doubles
 |-- frontend/
 |   |-- src/
 |   |   |-- api/                  # API clients and HTTP transport
-|   |   |-- components/           # Reusable UI components and widgets
-|   |   |-- constants/            # Metric definitions and status themes
+|   |   |-- components/
+|   |   |   |-- alerts/           # AlertCard, AlertHistoryList, AlertFilterTabs, ResolvedAlertsList
+|   |   |   |-- auth/             # ProtectedRoute
+|   |   |   |-- equipment/        # EquipmentTable, EquipmentRow, EquipmentForm, MetricChart, etc.
+|   |   |   |-- layout/           # AppLayout, AuthLayout, Sidebar, PageToolbar, Footer, UserBadge
+|   |   |   `-- ui/               # Button, Card, Modal, StatCard, StatusBadge, LiveIndicator, etc.
+|   |   |-- constants/            # Metric definitions, navigation items, status themes
 |   |   |-- context/              # Authentication context and provider
-|   |   |-- hooks/                # React hooks for SignalR, auth, and data fetching
-|   |   |-- pages/                # Dashboard, Equipment Detail, Alerts, and Login pages
+|   |   |-- hooks/                # React hooks for SignalR, auth, query params, deletions
+|   |   |-- pages/                # Dashboard, Equipment Detail, Alerts, Login, Register pages
+|   |   |-- store/                # Redux Toolkit store and feature slices (equipment, alerts, readings)
 |   |   |-- test/                 # Test setup and mocks
-|   |   `-- utils/                # Formatting, calculations, and role utilities
+|   |   `-- utils/                # Formatting, filtering, validation, and role utilities
+|   |-- .prettierrc               # Prettier code formatting configuration
+|   |-- eslint.config.js          # ESLint flat configuration
 |   |-- package.json
 |   `-- vite.config.js
 |-- mosquitto/
 |   `-- mosquitto.conf            # Mosquitto broker listener and security configuration
 |-- simulator/
-|   |-- index.js                  # IoT sensor telemetry generator
+|   |-- simulator.js              # IoT sensor telemetry generator with dynamic discovery
 |   `-- package.json
 `-- README.md
 ```
 
-## Frontend state
+## Code Conventions
+
+- **C# / Backend:**
+  - Files and types use `PascalCase` (e.g., `ReadingIngestionService.cs`, `ThresholdEvaluator`).
+  - Interfaces use `I` prefix (e.g., `IReadingIngestionService`, `IAuthService`).
+  - Asynchronous methods use the `Async` suffix (e.g., `IngestAsync`, `GetEquipmentByIdAsync`).
+- **React / Frontend:**
+  - Component files use `PascalCase.jsx` (e.g., `StatCard.jsx`, `EquipmentTable.jsx`).
+  - Custom React hooks use `useXxx.js` (e.g., `useQueryParam.js`, `useSignalR.js`).
+  - Constants use `UPPER_SNAKE_CASE` (e.g., `NAVIGATION_ITEMS`, `STATUS_COLORS`).
+  - Test files sit next to the file under test as `Name.test.jsx` or `name.test.js`.
+
+## Frontend State
 
 Application state is managed globally using Redux Toolkit.
 The centralized store combines three distinct feature slices:
@@ -195,14 +238,15 @@ The centralized store combines three distinct feature slices:
 
 ## Running the Tests
 
-To run the backend test suite (19 xUnit tests covering authentication, threshold logic, cache resilience, and alert lifecycles):
+To run the backend test suite:
 ```bash
 dotnet test backend/EquipmentMonitoring.Tests
 ```
 
-To run the frontend test suite (Vitest testing library tests covering components, badges, and reading transformations):
+To run the frontend test suite and lint checks:
 ```bash
 cd frontend
+npm run lint
 npm test
 ```
 
@@ -213,3 +257,4 @@ npm test
 3. Machine Learning Anomaly Detection: Current alerts use deterministic static thresholds. Adding statistical rolling-window anomaly models (e.g., z-score, Isolation Forest) would enable predictive maintenance before physical breaches occur.
 4. Granular User Management: User management is currently performed via seed scripts. An administrative management UI for creating and modifying user roles dynamically would be beneficial.
 5. The equipment list is not paginated; for large fleets add server-side filtering and paging.
+

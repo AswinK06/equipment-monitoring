@@ -29,9 +29,7 @@ export default function AlertsPage() {
     : activeAlerts;
 
   const eqMap = Object.fromEntries(equipment.map((e) => [e.id, e.name]));
-  const resolvedAlerts = allAlerts
-    .filter((a) => a.status === "Resolved")
-    .slice(0, 5);
+  const resolvedAlerts = allAlerts.filter((a) => a.status === "Resolved").slice(0, 5);
 
   return (
     <div className="space-y-8">
@@ -45,12 +43,7 @@ export default function AlertsPage() {
       <Card
         title="Unresolved Breaches"
         description={`Active threshold violations (${filteredAlerts.length})`}
-        actions={
-          <AlertFilterTabs
-            selectedStatus={statusFilter}
-            onSelectStatus={setStatusFilter}
-          />
-        }
+        actions={<AlertFilterTabs selectedStatus={statusFilter} onSelectStatus={setStatusFilter} />}
       >
         <div className="p-6">
           {filteredAlerts.length === 0 ? (

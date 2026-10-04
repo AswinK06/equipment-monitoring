@@ -15,7 +15,9 @@ describe("ConfirmDialog", () => {
 
     expect(screen.getByText("Delete equipment")).toBeInTheDocument();
     expect(
-      screen.getByText("Delete 'Pump A'? Its readings and alert history will also be permanently removed.")
+      screen.getByText(
+        "Delete 'Pump A'? Its readings and alert history will also be permanently removed."
+      )
     ).toBeInTheDocument();
   });
 

@@ -1,5 +1,9 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getAlerts, acknowledgeAlert as apiAcknowledgeAlert, resolveAlert as apiResolveAlert } from "../../api/alertsApi";
+import {
+  getAlerts,
+  acknowledgeAlert as apiAcknowledgeAlert,
+  resolveAlert as apiResolveAlert,
+} from "../../api/alertsApi";
 import { removeEquipment } from "./equipmentSlice";
 import { formatTime } from "../../utils/format";
 

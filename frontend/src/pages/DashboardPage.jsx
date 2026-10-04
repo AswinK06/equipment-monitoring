@@ -15,7 +15,11 @@ import StatusSummary from "../components/equipment/StatusSummary";
 import EquipmentToolbar from "../components/equipment/EquipmentToolbar";
 import EquipmentTable from "../components/equipment/EquipmentTable";
 import EquipmentForm from "../components/equipment/EquipmentForm";
-import { selectAllEquipment, selectStatusCounts, saveEquipment } from "../store/slices/equipmentSlice";
+import {
+  selectAllEquipment,
+  selectStatusCounts,
+  saveEquipment,
+} from "../store/slices/equipmentSlice";
 import { selectActiveAlerts } from "../store/slices/alertsSlice";
 import { selectReadingsMap } from "../store/slices/readingsSlice";
 
@@ -25,7 +29,8 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useQueryParam("status");
   const [searchQuery, setSearchQuery] = useQueryParam("q");
-  const { target, deleting, error, requestDelete, cancelDelete, confirmDelete } = useDeleteEquipment();
+  const { target, deleting, error, requestDelete, cancelDelete, confirmDelete } =
+    useDeleteEquipment();
   const [modalItem, setModalItem] = useState(undefined);
 
   const equipment = useSelector(selectAllEquipment);
@@ -79,11 +84,23 @@ export default function DashboardPage() {
           onSelect={(id) => navigate(`/equipment/${id}`)}
           onEdit={(item) => setModalItem(item)}
           onDelete={requestDelete}
-          emptyMessage={equipment.length === 0 ? "No equipment registered yet." : "No equipment matches the search or filter criteria."}
-          emptyAction={
+          emptyMessage={
             equipment.length === 0
-              ? canEdit && <Button variant="primary" onClick={() => setModalItem(null)}><Plus size={16} /> Add equipment</Button>
-              : <Button variant="secondary" onClick={handleClearFilters}>Clear filters</Button>
+              ? "No equipment registered yet."
+              : "No equipment matches the search or filter criteria."
+          }
+          emptyAction={
+            equipment.length === 0 ? (
+              canEdit && (
+                <Button variant="primary" onClick={() => setModalItem(null)}>
+                  <Plus size={16} /> Add equipment
+                </Button>
+              )
+            ) : (
+              <Button variant="secondary" onClick={handleClearFilters}>
+                Clear filters
+              </Button>
+            )
           }
         />
       </Card>

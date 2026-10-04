@@ -51,11 +51,7 @@ export default function LoginPage() {
   );
 
   return (
-    <AuthLayout
-      title="Sign in"
-      subtitle="Use your work account to continue"
-      footer={footer}
-    >
+    <AuthLayout title="Sign in" subtitle="Use your work account to continue" footer={footer}>
       <form onSubmit={handleSubmit} className="space-y-5">
         <FormField label="Email address">
           <input
@@ -78,9 +74,7 @@ export default function LoginPage() {
           />
         </FormField>
 
-        {(localError || authError) && (
-          <ErrorMessage message={localError || authError} />
-        )}
+        {(localError || authError) && <ErrorMessage message={localError || authError} />}
 
         <div className="pt-2">
           <Button

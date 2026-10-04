@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { API } from "../api/client";
 
-export function useSignalR({ onReadingsReceived, onAlertTriggered, onAlertUpdated, accessTokenFactory }) {
+export function useSignalR({
+  onReadingsReceived,
+  onAlertTriggered,
+  onAlertUpdated,
+  accessTokenFactory,
+}) {
   const [isLive, setIsLive] = useState(false);
   const handlersRef = useRef({ onReadingsReceived, onAlertTriggered, onAlertUpdated });
 
@@ -12,7 +17,6 @@ export function useSignalR({ onReadingsReceived, onAlertTriggered, onAlertUpdate
 
   useEffect(() => {
     if (!accessTokenFactory) {
-      setIsLive(false);
       return;
     }
 

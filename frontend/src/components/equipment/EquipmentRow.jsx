@@ -56,10 +56,7 @@ export default function EquipmentRow({
       <td className="px-6 py-4 text-sm text-slate-500 whitespace-nowrap">
         {formatRelativeTime(item.updatedAt)}
       </td>
-      <td
-        className="px-6 py-4 text-sm text-right"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <td className="px-6 py-4 text-sm text-right" onClick={(e) => e.stopPropagation()}>
         {canEdit && (
           <div className="flex items-center justify-end gap-1">
             <button

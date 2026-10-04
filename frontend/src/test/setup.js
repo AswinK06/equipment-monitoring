@@ -14,6 +14,8 @@ filesToDelete.forEach((rel) => {
   if (fs.existsSync(p)) {
     try {
       fs.unlinkSync(p);
-    } catch {}
+    } catch {
+      // ignore cleanup errors
+    }
   }
 });

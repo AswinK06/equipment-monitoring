@@ -8,12 +8,9 @@ export default function MetricValue({ metric, value }) {
 
   return (
     <span
-      className={`tabular-nums ${
-        isOver ? "font-bold text-red-600" : "font-medium text-slate-800"
-      }`}
+      className={`tabular-nums ${isOver ? "font-bold text-red-600" : "font-medium text-slate-800"}`}
     >
-      {formatNumber(value)}{" "}
-      <span className="text-xs font-normal text-slate-400">{unit}</span>
+      {formatNumber(value)} <span className="text-xs font-normal text-slate-400">{unit}</span>
     </span>
   );
 }

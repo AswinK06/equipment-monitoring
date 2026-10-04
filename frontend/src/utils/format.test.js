@@ -11,6 +11,16 @@ describe("format utilities", () => {
     vi.useRealTimers();
   });
 
+  it("formatNumber formats decimals and limits", () => {
+    expect(formatNumber(12.3456)).toBe("12.3");
+    expect(formatNumber(null)).toBe("—");
+  });
+
+  it("formatTime formats time strings", () => {
+    expect(formatTime(null)).toBe("—");
+    expect(formatTime("2026-10-04T12:00:00Z")).toBeDefined();
+  });
+
   it("formatRelativeTime formats correctly", () => {
     expect(formatRelativeTime(null)).toBe("—");
     expect(formatRelativeTime("2026-10-04T11:59:45Z")).toBe("just now");

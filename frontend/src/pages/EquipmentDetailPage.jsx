@@ -58,11 +58,7 @@ export default function EquipmentDetailPage() {
 
   return (
     <div className="space-y-8">
-      <EquipmentHeader
-        equipment={equipment}
-        canEdit={canEdit}
-        onEdit={() => setIsEditing(true)}
-      />
+      <EquipmentHeader equipment={equipment} canEdit={canEdit} onEdit={() => setIsEditing(true)} />
 
       <MetricTabs latest={latest} selectedMetric={metric} onSelect={setMetric} />
 
@@ -76,10 +72,7 @@ export default function EquipmentDetailPage() {
           <ReadingsTable rows={history} />
         </Card>
 
-        <Card
-          title="Alert Incident History"
-          description={`${alertHistory.length} total events`}
-        >
+        <Card title="Alert Incident History" description={`${alertHistory.length} total events`}>
           <div className="p-6">
             <AlertHistoryList alerts={alertHistory} />
           </div>

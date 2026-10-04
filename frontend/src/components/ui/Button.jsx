@@ -3,8 +3,7 @@ const VARIANT_STYLES = {
     "bg-brand-mint text-brand-navy hover:bg-brand-green focus-visible:ring-brand-mint shadow-sm",
   secondary:
     "bg-white text-brand-navy border border-slate-200 hover:bg-slate-50 hover:text-brand-ink focus-visible:ring-slate-400 shadow-sm",
-  danger:
-    "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 shadow-sm",
+  danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 shadow-sm",
 };
 
 export default function Button({

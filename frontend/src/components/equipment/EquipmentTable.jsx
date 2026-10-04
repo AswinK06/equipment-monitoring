@@ -26,8 +26,7 @@ export default function EquipmentTable({
     );
   }
 
-  const alertCountByEq = (eqId) =>
-    activeAlerts.filter((a) => a.equipmentId === eqId).length;
+  const alertCountByEq = (eqId) => activeAlerts.filter((a) => a.equipmentId === eqId).length;
 
   const table = (
     <div className="overflow-x-auto">

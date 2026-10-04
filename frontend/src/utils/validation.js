@@ -16,8 +16,7 @@ export function validateRegistration(values = {}) {
 
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
   if (!passwordRegex.test(password)) {
-    errors.password =
-      "Password must be at least 8 characters and contain a letter and a number.";
+    errors.password = "Password must be at least 8 characters and contain a letter and a number.";
   }
 
   if (password !== confirmPassword) {

@@ -5,10 +5,7 @@ export default function ResolvedAlertsList({ alerts = [], equipmentMap = {} }) {
   if (alerts.length === 0) return null;
 
   return (
-    <Card
-      title="Recently Resolved Incidents"
-      description="Last 5 resolved threshold breach events"
-    >
+    <Card title="Recently Resolved Incidents" description="Last 5 resolved threshold breach events">
       <div className="divide-y divide-slate-100">
         {alerts.map((a) => (
           <div
@@ -21,8 +18,8 @@ export default function ResolvedAlertsList({ alerts = [], equipmentMap = {} }) {
               </span>
               <span className="mx-2 text-slate-300">·</span>
               <span className="text-slate-600">
-                {a.metric} {a.kind === "Max" || a.kind === 1 ? "exceeded" : "breached"}{" "}
-                (measured: {a.value}, threshold: {a.threshold})
+                {a.metric} {a.kind === "Max" || a.kind === 1 ? "exceeded" : "breached"} (measured:{" "}
+                {a.value}, threshold: {a.threshold})
               </span>
               <div className="text-xs text-slate-400 mt-1">
                 Resolved at {a.time || a.resolvedAt || a.createdAt}

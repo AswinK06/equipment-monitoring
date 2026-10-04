@@ -43,10 +43,7 @@ describe("equipmentSlice", () => {
     };
 
     const nextState = {
-      equipment: equipmentReducer(
-        initialState,
-        saveEquipment.fulfilled(updatedItem)
-      ),
+      equipment: equipmentReducer(initialState, saveEquipment.fulfilled(updatedItem)),
     };
 
     const sorted = selectAllEquipment(nextState);

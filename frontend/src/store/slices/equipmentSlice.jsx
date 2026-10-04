@@ -1,5 +1,10 @@
 import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
-import { getEquipment, createEquipment, updateEquipment, deleteEquipment } from "../../api/equipmentApi";
+import {
+  getEquipment,
+  createEquipment,
+  updateEquipment,
+  deleteEquipment,
+} from "../../api/equipmentApi";
 import { STATUSES } from "../../constants/statuses";
 
 export const toEquipment = (e) => ({
@@ -33,9 +38,7 @@ export const saveEquipment = createAsyncThunk(
         status: toApiStatus(eq.status),
         installedDate: eq.installedDate,
       };
-      const result = eq.id
-        ? await updateEquipment(eq.id, payload)
-        : await createEquipment(payload);
+      const result = eq.id ? await updateEquipment(eq.id, payload) : await createEquipment(payload);
       return toEquipment(result);
     } catch (err) {
       return rejectWithValue(err.message);
@@ -43,13 +46,10 @@ export const saveEquipment = createAsyncThunk(
   }
 );
 
-export const removeEquipment = createAsyncThunk(
-  "equipment/remove",
-  async (id) => {
-    await deleteEquipment(id);
-    return id;
-  }
-);
+export const removeEquipment = createAsyncThunk("equipment/remove", async (id) => {
+  await deleteEquipment(id);
+  return id;
+});
 
 const initialState = {
   items: [],
@@ -96,26 +96,22 @@ const equipmentSlice = createSlice({
   },
 });
 
-export const selectAllEquipment = createSelector(
-  [(state) => state.equipment.items],
-  (items) => {
-    return [...items].sort((a, b) => {
-      const dateA = new Date(a.updatedAt || 0).getTime();
-      const dateB = new Date(b.updatedAt || 0).getTime();
-      if (dateB !== dateA) {
-        return dateB - dateA;
-      }
-      return (a.id ?? 0) - (b.id ?? 0);
-    });
-  }
-);
+export const selectAllEquipment = createSelector([(state) => state.equipment.items], (items) => {
+  return [...items].sort((a, b) => {
+    const dateA = new Date(a.updatedAt || 0).getTime();
+    const dateB = new Date(b.updatedAt || 0).getTime();
+    if (dateB !== dateA) {
+      return dateB - dateA;
+    }
+    return (a.id ?? 0) - (b.id ?? 0);
+  });
+});
 
 export const selectEquipmentById = (idOrState, maybeId) => {
   if (maybeId !== undefined) {
     return idOrState.equipment.items.find((item) => String(item.id) === String(maybeId));
   }
-  return (state) =>
-    state.equipment.items.find((item) => String(item.id) === String(idOrState));
+  return (state) => state.equipment.items.find((item) => String(item.id) === String(idOrState));
 };
 
 export const selectStatusCounts = (state) => {

@@ -4,8 +4,7 @@ export default function AlertFilterTabs({ selectedStatus = "", onSelectStatus })
   return (
     <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
       {tabs.map((status) => {
-        const isSelected =
-          (status === "All" && !selectedStatus) || selectedStatus === status;
+        const isSelected = (status === "All" && !selectedStatus) || selectedStatus === status;
         return (
           <button
             key={status}

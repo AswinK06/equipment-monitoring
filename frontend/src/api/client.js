@@ -35,7 +35,9 @@ export async function api(path, opts = {}) {
     try {
       const p = await res.json();
       msg = p.errors ? Object.values(p.errors).flat().join(" ") : p.detail || p.title || msg;
-    } catch {}
+    } catch {
+      // ignore json parse error on non-json body
+    }
     throw new Error(msg);
   }
 

@@ -18,7 +18,9 @@ export default function UserBadge({ user }) {
           {user.displayName || user.email}
         </div>
         <div className="flex items-center gap-2 sm:mt-0.5">
-          <span className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${roleBadgeStyle}`}>
+          <span
+            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase ${roleBadgeStyle}`}
+          >
             {user.role}
           </span>
           <span className="hidden md:inline text-xs text-slate-500 truncate max-w-[200px]">

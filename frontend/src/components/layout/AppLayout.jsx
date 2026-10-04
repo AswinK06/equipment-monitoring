@@ -31,7 +31,9 @@ export default function AppLayout() {
       const next = !prev;
       try {
         localStorage.setItem("sidebarCollapsed", String(next));
-      } catch {}
+      } catch {
+        // ignore localStorage errors
+      }
       return next;
     });
   };
@@ -62,17 +64,16 @@ export default function AppLayout() {
           });
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        // handled by redux slice error state
+      });
   }, [dispatch]);
 
   return (
     <div className="flex min-h-screen bg-slate-100/80 text-slate-800 font-sans antialiased selection:bg-brand-mint selection:text-brand-navy">
       {/* Desktop Sidebar (visible on lg+) */}
       <div className="hidden lg:block shrink-0">
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={handleToggleCollapse}
-        />
+        <Sidebar collapsed={collapsed} onToggle={handleToggleCollapse} />
       </div>
 
       {/* Mobile Drawer (visible on <lg) */}
@@ -89,31 +90,20 @@ export default function AppLayout() {
             mobileOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          <Sidebar
-            collapsed={false}
-            onCloseMobile={() => setMobileOpen(false)}
-          />
+          <Sidebar collapsed={false} onCloseMobile={() => setMobileOpen(false)} />
         </div>
       </div>
 
       {/* Main Column */}
       <div className="min-w-0 flex-1 flex flex-col">
-        <PageToolbar
-          isLive={isLive}
-          onMenuClick={() => setMobileOpen(true)}
-          user={user}
-        />
+        <PageToolbar isLive={isLive} onMenuClick={() => setMobileOpen(true)} user={user} />
 
         {/* Page Content */}
         <main className="min-w-0 flex-1">
           <div className="mx-auto w-full max-w-10xl px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
             <ErrorMessage message={error} />
 
-            {loading ? (
-              <Loading text="Loading industrial equipment fleet…" />
-            ) : (
-              <Outlet />
-            )}
+            {loading ? <Loading text="Loading industrial equipment fleet…" /> : <Outlet />}
           </div>
         </main>
 

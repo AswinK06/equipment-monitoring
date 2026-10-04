@@ -92,7 +92,9 @@ export default function RegisterPage() {
             placeholder="••••••••"
             required
           />
-          <p className="mt-1 text-xs text-slate-400">At least 8 characters, with a letter and a number</p>
+          <p className="mt-1 text-xs text-slate-400">
+            At least 8 characters, with a letter and a number
+          </p>
         </FormField>
 
         <FormField label="Confirm password" error={errors.confirmPassword}>
@@ -108,7 +110,12 @@ export default function RegisterPage() {
         {(serverError || authError) && <ErrorMessage message={serverError || authError} />}
 
         <div className="pt-2">
-          <Button type="submit" variant="primary" disabled={loading} className="w-full h-11 text-sm font-bold">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-full h-11 text-sm font-bold"
+          >
             {loading ? "Creating account..." : "Create account"}
           </Button>
         </div>

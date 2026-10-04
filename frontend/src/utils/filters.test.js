@@ -3,10 +3,34 @@ import { filterEquipment } from "./filters";
 
 describe("filterEquipment", () => {
   const sampleEquipment = [
-    { id: 1, name: "Generator Alpha", type: "Generator", location: "Plant 1 · Bay 2", status: "Active" },
-    { id: 2, name: "Hydraulic Pump #2", type: "Pump", location: "Plant 1 · Bay 4", status: "Faulty" },
-    { id: 3, name: "Compressor C-7", type: "Compressor", location: "Plant 2 · Utility", status: "Idle" },
-    { id: 4, name: "Cooling Fan F-3", type: "Fan", location: "Plant 1 · Roof", status: "Under Maintenance" },
+    {
+      id: 1,
+      name: "Generator Alpha",
+      type: "Generator",
+      location: "Plant 1 · Bay 2",
+      status: "Active",
+    },
+    {
+      id: 2,
+      name: "Hydraulic Pump #2",
+      type: "Pump",
+      location: "Plant 1 · Bay 4",
+      status: "Faulty",
+    },
+    {
+      id: 3,
+      name: "Compressor C-7",
+      type: "Compressor",
+      location: "Plant 2 · Utility",
+      status: "Idle",
+    },
+    {
+      id: 4,
+      name: "Cooling Fan F-3",
+      type: "Fan",
+      location: "Plant 1 · Roof",
+      status: "Under Maintenance",
+    },
   ];
 
   it("returns all equipment when status and query are not provided", () => {

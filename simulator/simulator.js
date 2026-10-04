@@ -7,6 +7,13 @@ const API_BASE = process.env.API_BASE || "http://localhost:5000";
 const AUTO_DISCOVER = process.env.AUTO_DISCOVER === "true";
 const INTERVAL = Number(process.env.INTERVAL_MS || 2000);
 const FALLBACK_IDS = (process.env.EQUIPMENT_IDS || "1,2,3,4").split(",").map(Number);
+const SIM_EMAIL = process.env.SIM_EMAIL;
+const SIM_PASSWORD = process.env.SIM_PASSWORD;
+
+if (AUTO_DISCOVER && (!SIM_EMAIL || !SIM_PASSWORD)) {
+  console.error("Error: AUTO_DISCOVER is enabled, but SIM_EMAIL or SIM_PASSWORD environment variable is missing.");
+  process.exit(1);
+}
 
 // Default baseline profiles for machines
 const PROFILES = {
@@ -48,7 +55,7 @@ async function fetchAuthToken() {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "viewer@sustainabyte.local", password: "ViewerPassword123!" }),
+      body: JSON.stringify({ email: SIM_EMAIL, password: SIM_PASSWORD }),
     });
     if (!res.ok) return null;
     const data = await res.json();

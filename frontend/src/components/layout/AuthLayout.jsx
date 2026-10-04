@@ -38,7 +38,10 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
 
           <ul className="mt-8 space-y-4">
             {points.map((point) => (
-              <li key={point} className="flex items-center gap-3 text-sm font-semibold text-slate-200">
+              <li
+                key={point}
+                className="flex items-center gap-3 text-sm font-semibold text-slate-200"
+              >
                 <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-mint/20 text-brand-mint ring-1 ring-brand-mint/30">
                   <Check size={14} className="stroke-[3]" />
                 </div>
@@ -62,7 +65,9 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-navy text-brand-mint shadow-md">
               <Activity size={26} />
             </div>
-            <div className="text-xl font-extrabold tracking-widest text-brand-navy">SUSTAINABYTE</div>
+            <div className="text-xl font-extrabold tracking-widest text-brand-navy">
+              SUSTAINABYTE
+            </div>
             <div className="text-xs font-bold tracking-widest text-brand-green mt-0.5">
               EQUIPMENT MONITOR
             </div>
@@ -71,18 +76,12 @@ export default function AuthLayout({ title, subtitle, children, footer }) {
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
             <div className="mb-8">
               <h2 className="text-3xl font-extrabold text-brand-navy tracking-tight">{title}</h2>
-              {subtitle && (
-                <p className="mt-2 text-sm text-slate-500">{subtitle}</p>
-              )}
+              {subtitle && <p className="mt-2 text-sm text-slate-500">{subtitle}</p>}
             </div>
 
             {children}
 
-            {footer && (
-              <div className="mt-6 text-center text-sm text-slate-500">
-                {footer}
-              </div>
-            )}
+            {footer && <div className="mt-6 text-center text-sm text-slate-500">{footer}</div>}
           </div>
 
           <p className="mt-6 text-center text-xs text-slate-400">

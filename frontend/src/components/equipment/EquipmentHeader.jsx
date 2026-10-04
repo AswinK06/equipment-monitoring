@@ -30,7 +30,13 @@ export default function EquipmentHeader({ equipment, canEdit = false, onEdit }) 
             {equipment.name}
           </h1>
           <p className="text-sm text-slate-500 mt-2">
-            Located at <span className="font-semibold text-slate-700">{equipment.location}</span> · Commissioned on <span className="font-semibold text-slate-700">{equipment.installedDate}</span> · Updated <span className="font-semibold text-slate-700">{formatRelativeTime(equipment.updatedAt)}</span>
+            Located at <span className="font-semibold text-slate-700">{equipment.location}</span> ·
+            Commissioned on{" "}
+            <span className="font-semibold text-slate-700">{equipment.installedDate}</span> ·
+            Updated{" "}
+            <span className="font-semibold text-slate-700">
+              {formatRelativeTime(equipment.updatedAt)}
+            </span>
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -47,7 +53,8 @@ export default function EquipmentHeader({ equipment, canEdit = false, onEdit }) 
         <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-900 shadow-sm">
           <span className="flex h-2.5 w-2.5 rounded-full bg-amber-500 animate-ping" />
           <span>
-            <strong>Telemetry Paused:</strong> Unit is currently in <em>{equipment.status}</em> state. Live streaming is stopped; displaying last recorded telemetry values.
+            <strong>Telemetry Paused:</strong> Unit is currently in <em>{equipment.status}</em>{" "}
+            state. Live streaming is stopped; displaying last recorded telemetry values.
           </span>
         </div>
       )}

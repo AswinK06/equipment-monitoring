@@ -5,11 +5,7 @@ import { selectActiveAlerts } from "../../store/slices/alertsSlice";
 import { NAVIGATION_ITEMS } from "../../constants/navigation";
 import SidebarItem from "./SidebarItem";
 
-export default function Sidebar({
-  collapsed = false,
-  onToggle,
-  onCloseMobile,
-}) {
+export default function Sidebar({ collapsed = false, onToggle, onCloseMobile }) {
   const { logout } = useAuth();
   const activeAlerts = useSelector(selectActiveAlerts);
   const activeAlertCount = activeAlerts ? activeAlerts.length : 0;

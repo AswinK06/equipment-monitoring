@@ -46,7 +46,11 @@ export default function SidebarItem({
               {Icon && (
                 <Icon
                   size={18}
-                  className={isActive ? "text-brand-mint" : "text-slate-300 group-hover:text-white transition-colors"}
+                  className={
+                    isActive
+                      ? "text-brand-mint"
+                      : "text-slate-300 group-hover:text-white transition-colors"
+                  }
                 />
               )}
               {collapsed && badge > 0 && (
