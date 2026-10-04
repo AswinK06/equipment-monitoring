@@ -24,7 +24,6 @@ export default function AlertsPage({
         subtitle="Industrial IoT telemetry breaches detected in real time by threshold evaluation."
       />
 
-      {/* Active alerts section */}
       <div className="space-y-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
           Unresolved Breaches ({openAlerts.length})
@@ -45,7 +44,6 @@ export default function AlertsPage({
         )}
       </div>
 
-      {/* Recently resolved alerts */}
       {resolvedAlerts.length > 0 && (
         <div className="space-y-3 pt-4 border-t border-slate-200">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">

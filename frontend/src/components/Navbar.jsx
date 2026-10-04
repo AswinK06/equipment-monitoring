@@ -16,10 +16,8 @@ export default function Navbar({ activePage, alertCount = 0, isLive = false, onN
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-navy shadow-md">
-      {/* 2px mint-to-green top gradient line */}
       <div className="h-0.5 w-full bg-gradient-to-r from-brand-mint via-brand-green to-emerald-400" />
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        {/* Brand wordmark */}
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-navy2 text-brand-mint ring-1 ring-white/10">
             <Activity size={20} />
@@ -32,7 +30,6 @@ export default function Navbar({ activePage, alertCount = 0, isLive = false, onN
           </div>
         </div>
 
-        {/* Navigation tabs */}
         <nav className="flex items-center gap-1 sm:gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -61,7 +58,6 @@ export default function Navbar({ activePage, alertCount = 0, isLive = false, onN
           })}
         </nav>
 
-        {/* Right side: Live status, user badge, logout */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 ring-1 ring-white/10">
             <Radio size={14} className={isLive ? "text-emerald-400 animate-pulse" : "text-red-400"} />

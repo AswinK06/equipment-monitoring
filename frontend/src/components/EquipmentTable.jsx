@@ -1,3 +1,5 @@
+import { useAuth } from "../hooks/useAuth";
+import { isAdmin } from "../utils/roles";
 import EquipmentRow from "./EquipmentRow";
 import EmptyState from "./EmptyState";
 
@@ -8,6 +10,9 @@ export default function EquipmentTable({
   onSelect,
   onEdit,
 }) {
+  const { user } = useAuth();
+  const canEdit = isAdmin(user);
+
   if (equipment.length === 0) {
     return <EmptyState message="No equipment found matching the selected filter." />;
   }
@@ -41,6 +46,7 @@ export default function EquipmentTable({
                 item={item}
                 latestReading={latest}
                 alertCount={alertCountByEq(item.id)}
+                canEdit={canEdit}
                 onSelect={onSelect}
                 onEdit={onEdit}
               />

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, Pencil } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import { isAdmin } from "../utils/roles";
 import StatusBadge from "../components/StatusBadge";
 import Button from "../components/Button";
 import MetricTabs from "../components/MetricTabs";
@@ -9,6 +11,8 @@ import AlertHistoryList from "../components/AlertHistoryList";
 import EquipmentForm from "../components/EquipmentForm";
 
 export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
+  const { user } = useAuth();
+  const canEdit = isAdmin(user);
   const [metric, setMetric] = useState("temperature");
   const [isEditing, setIsEditing] = useState(false);
 
@@ -38,7 +42,6 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
         <ArrowLeft size={16} /> Back to all equipment
       </button>
 
-      {/* Header card */}
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         <div>
           <span className="text-[11px] font-bold uppercase tracking-widest text-brand-green">
@@ -53,19 +56,18 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
         </div>
         <div className="flex items-center gap-3">
           <StatusBadge status={equipment.status} />
-          <Button variant="secondary" onClick={() => setIsEditing(true)}>
-            <Pencil size={14} /> Edit
-          </Button>
+          {canEdit && (
+            <Button variant="secondary" onClick={() => setIsEditing(true)}>
+              <Pencil size={14} /> Edit
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Metric selection tabs */}
       <MetricTabs latest={latest} selectedMetric={metric} onSelect={setMetric} />
 
-      {/* Navy panel chart */}
       <MetricChart data={history} metric={metric} />
 
-      {/* Dual tables: Recent telemetry & Alert history */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -74,13 +76,13 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
             </h3>
             <span className="text-[11px] text-slate-400">Latest 10 packets</span>
           </div>
-          <ReadingsTable rows={history} />
+          <ReadingsTable readings={history.slice(-10).reverse()} />
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Machine Incident Log
+              Alert Incident History
             </h3>
             <span className="text-[11px] text-slate-400">{alertHistory.length} total events</span>
           </div>
@@ -88,7 +90,7 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
         </div>
       </div>
 
-      {isEditing && (
+      {isEditing && canEdit && (
         <EquipmentForm
           item={equipment}
           onClose={() => setIsEditing(false)}

@@ -1,14 +1,16 @@
 import { Pencil } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
-import { isAdmin } from "../utils/roles";
 import StatusBadge from "./StatusBadge";
 import AlertCountBadge from "./AlertCountBadge";
 import MetricValue from "./MetricValue";
 
-export default function EquipmentRow({ item, latestReading = {}, alertCount = 0, onSelect, onEdit }) {
-  const { user } = useAuth();
-  const canEdit = isAdmin(user);
-
+export default function EquipmentRow({
+  item,
+  latestReading = {},
+  alertCount = 0,
+  canEdit = false,
+  onSelect,
+  onEdit,
+}) {
   return (
     <tr
       onClick={() => onSelect(item.id)}

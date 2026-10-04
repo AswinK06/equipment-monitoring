@@ -1,6 +1,4 @@
-export const API =
-  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) ||
-  "http://localhost:5000";
+export const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 let onUnauthorizedCallback = null;
 
@@ -8,9 +6,8 @@ export function setUnauthorizedHandler(handler) {
   onUnauthorizedCallback = handler;
 }
 
-/** Fetch JSON from the backend; throws Error with a readable message (RFC 7807 detail / validation errors). */
 export async function api(path, opts = {}) {
-  const token = typeof window !== "undefined" ? sessionStorage.getItem("auth_token") : null;
+  const token = sessionStorage.getItem("auth_token");
   const headers = {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
