@@ -1,10 +1,11 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createSelector } from "@reduxjs/toolkit";
 import { getEquipment, createEquipment, updateEquipment } from "../../api/equipmentApi";
 import { STATUSES } from "../../constants/statuses";
 
 export const toEquipment = (e) => ({
   ...e,
   status: e.status === "UnderMaintenance" ? "Under Maintenance" : e.status,
+  updatedAt: e.updatedAt,
 });
 
 export const toApiStatus = (s) => (s ? s.replace(" ", "") : s);
@@ -84,7 +85,19 @@ const equipmentSlice = createSlice({
   },
 });
 
-export const selectAllEquipment = (state) => state.equipment.items;
+export const selectAllEquipment = createSelector(
+  [(state) => state.equipment.items],
+  (items) => {
+    return [...items].sort((a, b) => {
+      const dateA = new Date(a.updatedAt || 0).getTime();
+      const dateB = new Date(b.updatedAt || 0).getTime();
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return (a.id ?? 0) - (b.id ?? 0);
+    });
+  }
+);
 
 export const selectEquipmentById = (idOrState, maybeId) => {
   if (maybeId !== undefined) {

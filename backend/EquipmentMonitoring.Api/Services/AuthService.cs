@@ -1,6 +1,8 @@
 using EquipmentMonitoring.Api.Data;
 using EquipmentMonitoring.Api.Dtos;
+using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Exceptions;
+using EquipmentMonitoring.Api.Models;
 using EquipmentMonitoring.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +22,30 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
             throw new UnauthorizedException(InvalidCredentialsMessage);
         }
 
-        var (token, expiresAt) = tokenService.GenerateToken(user);
-        return new LoginResponse(token, expiresAt, user.Email, user.DisplayName, user.Role.ToString());
+        return BuildLoginResponse(user);
+    }
+
+    public async Task<LoginResponse> RegisterAsync(RegisterRequest request, CancellationToken ct)
+    {
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+        var exists = await db.Users.AnyAsync(u => u.Email.ToLower() == normalizedEmail, ct);
+        if (exists)
+        {
+            throw new ConflictException("An account with this email already exists.");
+        }
+
+        var user = new User
+        {
+            Email = normalizedEmail,
+            DisplayName = request.DisplayName.Trim(),
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Role = UserRole.Viewer,
+        };
+
+        db.Users.Add(user);
+        await db.SaveChangesAsync(ct);
+
+        return BuildLoginResponse(user);
     }
 
     public async Task<UserInfoResponse> GetCurrentUserAsync(int userId, CancellationToken ct)
@@ -30,5 +54,11 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
             ?? throw new NotFoundException($"User {userId} was not found.");
 
         return new UserInfoResponse(user.Email, user.DisplayName, user.Role.ToString());
+    }
+
+    private LoginResponse BuildLoginResponse(User user)
+    {
+        var (token, expiresAt) = tokenService.GenerateToken(user);
+        return new LoginResponse(token, expiresAt, user.Email, user.DisplayName, user.Role.ToString());
     }
 }

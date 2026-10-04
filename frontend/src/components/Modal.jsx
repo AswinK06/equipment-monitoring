@@ -17,16 +17,16 @@ export default function Modal({ title, onClose, children }) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-slate-200">
-        <div className="mb-5 flex items-center justify-between border-b border-slate-100 pb-3">
-          <h3 className="text-lg font-bold text-brand-navy">{title}</h3>
+      <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-2xl">
+        <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
+          <h3 className="text-xl font-bold text-brand-navy">{title}</h3>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
         {children}

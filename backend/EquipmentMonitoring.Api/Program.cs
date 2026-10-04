@@ -35,6 +35,7 @@ builder.Services.AddSignalR().AddJsonProtocol(o =>
 builder.Services.AddJwtAuthentication(cfg);
 builder.Services.AddSwaggerWithJwt();
 builder.Services.AddAppCache(cfg);
+builder.Services.AddAuthRateLimiting();
 
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
@@ -71,6 +72,7 @@ app.UseCors();
 app.UseSwagger();
 app.UseSwaggerUI();
 
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

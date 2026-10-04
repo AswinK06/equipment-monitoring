@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PageHeader from "../components/PageHeader";
 import AlertCard from "../components/AlertCard";
+import Card from "../components/Card";
 import EmptyState from "../components/EmptyState";
 import StatusBadge from "../components/StatusBadge";
 import {
@@ -29,7 +30,7 @@ export default function AlertsPage({
 
   const handleFilterClick = (status) => {
     const next = Object.fromEntries(searchParams.entries());
-    if (statusFilter === status) {
+    if (!status || status === "All" || statusFilter === status) {
       delete next.status;
     } else {
       next.status = status;
@@ -79,74 +80,73 @@ export default function AlertsPage({
         subtitle="Industrial IoT telemetry breaches detected in real time by threshold evaluation."
       />
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            Unresolved Breaches ({filteredAlerts.length})
-          </h3>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleFilterClick("Open")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-                statusFilter === "Open"
-                  ? "bg-red-600 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Open
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFilterClick("Acknowledged")}
-              className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-all ${
-                statusFilter === "Acknowledged"
-                  ? "bg-amber-500 text-white shadow-sm"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-              }`}
-            >
-              Acknowledged
-            </button>
+      <Card
+        title="Unresolved Breaches"
+        description={`Active threshold violations (${filteredAlerts.length})`}
+        actions={
+          <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+            {["All", "Open", "Acknowledged"].map((status) => {
+              const isSelected =
+                (status === "All" && !statusFilter) || statusFilter === status;
+              return (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => handleFilterClick(status === "All" ? null : status)}
+                  className={`rounded-lg px-4 py-1.5 text-xs font-bold transition-all ${
+                    isSelected
+                      ? "bg-white text-brand-navy shadow-sm"
+                      : "text-slate-600 hover:text-brand-navy"
+                  }`}
+                >
+                  {status}
+                </button>
+              );
+            })}
           </div>
+        }
+      >
+        <div className="p-6">
+          {filteredAlerts.length === 0 ? (
+            <EmptyState message="All clear. No active threshold breaches detected." />
+          ) : (
+            <div className="space-y-4">
+              {filteredAlerts.map((alert) => (
+                <AlertCard
+                  key={alert.id}
+                  alert={alert}
+                  equipmentName={eqMap[alert.equipmentId]}
+                  onAcknowledge={handleAcknowledge}
+                  onResolve={handleResolve}
+                  onOpen={handleSelectEquipment}
+                />
+              ))}
+            </div>
+          )}
         </div>
-
-        {filteredAlerts.length === 0 ? (
-          <EmptyState message="All systems operational. No active threshold breaches detected." />
-        ) : (
-          filteredAlerts.map((alert) => (
-            <AlertCard
-              key={alert.id}
-              alert={alert}
-              equipmentName={eqMap[alert.equipmentId]}
-              onAcknowledge={handleAcknowledge}
-              onResolve={handleResolve}
-              onOpen={handleSelectEquipment}
-            />
-          ))
-        )}
-      </div>
+      </Card>
 
       {resolvedAlerts.length > 0 && (
-        <div className="space-y-3 pt-4 border-t border-slate-200">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Recently Resolved Incidents
-          </h3>
-          <div className="divide-y divide-slate-100 rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <Card
+          title="Recently Resolved Incidents"
+          description="Last 5 resolved threshold breach events"
+        >
+          <div className="divide-y divide-slate-100">
             {resolvedAlerts.map((a) => (
               <div
                 key={a.id}
-                className="flex items-center justify-between p-4 text-xs transition-colors hover:bg-slate-50"
+                className="flex items-center justify-between p-6 text-sm transition-colors hover:bg-slate-50"
               >
                 <div>
                   <span className="font-bold text-brand-navy">
                     {eqMap[a.equipmentId] || `Unit #${a.equipmentId}`}
                   </span>
-                  <span className="mx-1.5 text-slate-300">·</span>
+                  <span className="mx-2 text-slate-300">·</span>
                   <span className="text-slate-600">
                     {a.metric} {a.kind === "Max" || a.kind === 1 ? "exceeded" : "breached"}{" "}
                     (measured: {a.value}, threshold: {a.threshold})
                   </span>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
+                  <div className="text-xs text-slate-400 mt-1">
                     Resolved at {a.time || a.resolvedAt || a.createdAt}
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export default function AlertsPage({
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
     </div>
   );

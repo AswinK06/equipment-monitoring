@@ -9,31 +9,40 @@ export default function EquipmentTable({
   activeAlerts = [],
   onSelect,
   onEdit,
+  emptyMessage,
+  emptyAction,
+  bordered = false,
 }) {
   const { user } = useAuth();
   const canEdit = isAdmin(user);
 
   if (equipment.length === 0) {
-    return <EmptyState message="No equipment found matching the selected filter." />;
+    return (
+      <EmptyState
+        message={emptyMessage || "No equipment found matching the selected filter."}
+        action={emptyAction}
+      />
+    );
   }
 
   const alertCountByEq = (eqId) =>
     activeAlerts.filter((a) => a.equipmentId === eqId).length;
 
-  return (
-    <div className="overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-      <table className="min-w-full text-left text-sm">
-        <thead className="border-b border-slate-200 bg-slate-50/70 text-xs font-semibold uppercase tracking-wider text-slate-500">
+  const table = (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-left">
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
           <tr>
-            <th className="px-4 py-3">Equipment</th>
-            <th className="px-4 py-3">Type</th>
-            <th className="px-4 py-3">Location</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3 text-right">Temp</th>
-            <th className="px-4 py-3 text-right">Vib</th>
-            <th className="px-4 py-3 text-right">Pressure</th>
-            <th className="px-4 py-3">Alerts</th>
-            <th className="px-4 py-3 text-right">Action</th>
+            <th className="px-6 py-3.5">Equipment</th>
+            <th className="px-6 py-3.5">Type</th>
+            <th className="px-6 py-3.5">Location</th>
+            <th className="px-6 py-3.5">Status</th>
+            <th className="px-6 py-3.5 text-right">Temp</th>
+            <th className="px-6 py-3.5 text-right">Vib</th>
+            <th className="px-6 py-3.5 text-right">Pressure</th>
+            <th className="px-6 py-3.5">Alerts</th>
+            <th className="px-6 py-3.5">Updated</th>
+            <th className="px-6 py-3.5 text-right">Action</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100">
@@ -56,4 +65,14 @@ export default function EquipmentTable({
       </table>
     </div>
   );
+
+  if (bordered) {
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+        {table}
+      </div>
+    );
+  }
+
+  return table;
 }

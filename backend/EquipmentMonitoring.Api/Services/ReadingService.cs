@@ -20,7 +20,16 @@ public class ReadingService(AppDbContext db, IRealtimeNotifier notifier, ICacheS
 
     public async Task<IngestResult> IngestAsync(int equipmentId, IngestRequest request, CancellationToken ct)
     {
-        await EnsureEquipmentExistsAsync(equipmentId, ct);
+        var eq = await db.Equipment.AsNoTracking().FirstOrDefaultAsync(e => e.Id == equipmentId, ct);
+        if (eq is null)
+        {
+            throw new NotFoundException($"Equipment {equipmentId} was not found.");
+        }
+
+        if (eq.Status is EquipmentStatus.Faulty or EquipmentStatus.UnderMaintenance)
+        {
+            return new IngestResult(0, Array.Empty<AlertDto>());
+        }
 
         var ts = AsUtc(request.Timestamp ?? DateTime.UtcNow);
         var thresholds = await LoadThresholdsAsync(equipmentId, ct);

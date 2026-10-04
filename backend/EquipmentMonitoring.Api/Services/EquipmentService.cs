@@ -15,7 +15,7 @@ public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipment
         var cached = await cache.GetAsync<IReadOnlyList<EquipmentDto>>(CacheKeys.EquipmentList);
         if (cached != null) return cached;
 
-        var list = (await db.Equipment.AsNoTracking().OrderBy(e => e.Id).ToListAsync(ct))
+        var list = (await db.Equipment.AsNoTracking().OrderByDescending(e => e.UpdatedAt).ThenBy(e => e.Id).ToListAsync(ct))
             .Select(e => e.ToDto())
             .ToList();
 
@@ -79,5 +79,6 @@ public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipment
         e.Location = r.Location.Trim();
         e.Status = r.Status!.Value;
         e.InstalledDate = r.InstalledDate!.Value;
+        e.UpdatedAt = DateTime.UtcNow;
     }
 }

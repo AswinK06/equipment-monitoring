@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { useNavigate, useLocation, Navigate } from "react-router-dom";
+import { useNavigate, useLocation, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import AuthLayout from "../components/AuthLayout";
 import FormField from "../components/FormField";
+import PasswordInput from "../components/PasswordInput";
 import Button from "../components/Button";
 import ErrorMessage from "../components/ErrorMessage";
-import { Activity } from "lucide-react";
 
 export default function LoginPage() {
   const { token, login, authError } = useAuth();
@@ -18,7 +19,7 @@ export default function LoginPage() {
   const destination = location.state?.from?.pathname || "/";
 
   if (token) {
-    return <Navigate to={destination} replace />;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -40,70 +41,58 @@ export default function LoginPage() {
     }
   };
 
+  const footer = (
+    <span>
+      New here?{" "}
+      <Link to="/register" className="font-semibold text-brand-green hover:underline">
+        Create an account
+      </Link>
+    </span>
+  );
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-navy text-brand-mint shadow-md">
-            <Activity size={26} />
-          </div>
-          <h2 className="text-xl font-extrabold tracking-tight text-brand-navy">
-            SUSTAINABYTE
-          </h2>
-          <p className="text-xs font-bold uppercase tracking-widest text-brand-green mt-0.5">
-            Equipment Monitor
-          </p>
-          <p className="mt-2 text-xs text-slate-500">
-            Sign in to access industrial telemetry and equipment controls.
-          </p>
+    <AuthLayout
+      title="Sign in"
+      subtitle="Use your work account to continue"
+      footer={footer}
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <FormField label="Email address">
+          <input
+            type="email"
+            required
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="e.g. operator@sustainabyte.local"
+            className="w-full h-11 px-3.5 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-green focus:outline-none"
+          />
+        </FormField>
+
+        <FormField label="Password">
+          <PasswordInput
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            required
+          />
+        </FormField>
+
+        {(localError || authError) && (
+          <ErrorMessage message={localError || authError} />
+        )}
+
+        <div className="pt-2">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={loading}
+            className="w-full h-11 text-sm font-bold"
+          >
+            {loading ? "Signing in…" : "Sign In"}
+          </Button>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Email address">
-            <input
-              type="email"
-              required
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. operator@sustainabyte.local"
-              className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
-            />
-          </FormField>
-
-          <FormField label="Password">
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full rounded-lg border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
-            />
-          </FormField>
-
-          {(localError || authError) && (
-            <div className="pt-1">
-              <ErrorMessage message={localError || authError} />
-            </div>
-          )}
-
-          <div className="pt-2">
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={loading}
-              className="w-full py-2.5 text-sm font-bold"
-            >
-              {loading ? "Signing in…" : "Sign In"}
-            </Button>
-          </div>
-        </form>
-
-        <div className="mt-6 border-t border-slate-100 pt-4 text-center text-xs text-slate-400">
-          Demo: admin@sustainabyte.local · viewer@sustainabyte.local
-        </div>
-      </div>
-    </div>
+      </form>
+    </AuthLayout>
   );
 }

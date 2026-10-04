@@ -25,11 +25,14 @@ export default function EquipmentForm({ item, onSave, onClose }) {
     onClose();
   };
 
+  const inputClass =
+    "w-full h-11 px-3.5 rounded-lg border border-slate-300 text-sm text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-brand-green focus:outline-none";
+
   return (
     <Modal title={item ? `Edit ${item.name}` : "Register New Equipment"} onClose={onClose}>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="rounded-lg bg-red-50 p-2.5 text-xs font-semibold text-red-600">
+          <div className="rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-600 border border-red-200">
             {error}
           </div>
         )}
@@ -40,19 +43,19 @@ export default function EquipmentForm({ item, onSave, onClose }) {
             required
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+            className={inputClass}
             placeholder="e.g. Generator A"
           />
         </FormField>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <FormField label="Equipment Type">
             <input
               type="text"
               required
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value })}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+              className={inputClass}
               placeholder="e.g. Pump"
             />
           </FormField>
@@ -61,7 +64,7 @@ export default function EquipmentForm({ item, onSave, onClose }) {
             <select
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+              className={inputClass}
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -78,7 +81,7 @@ export default function EquipmentForm({ item, onSave, onClose }) {
             required
             value={form.location}
             onChange={(e) => setForm({ ...form, location: e.target.value })}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+            className={inputClass}
             placeholder="e.g. Plant 1 · Bay 2"
           />
         </FormField>
@@ -89,11 +92,11 @@ export default function EquipmentForm({ item, onSave, onClose }) {
             required
             value={form.installedDate}
             onChange={(e) => setForm({ ...form, installedDate: e.target.value })}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-brand-green focus:outline-none focus:ring-1 focus:ring-brand-green"
+            className={inputClass}
           />
         </FormField>
 
-        <div className="mt-6 flex justify-end gap-2.5 pt-2">
+        <div className="mt-8 flex justify-end gap-3">
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

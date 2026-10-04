@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState } from "react";
-import { login as apiLogin } from "../api/authApi";
+import { login as apiLogin, register as apiRegister } from "../api/authApi";
 import { setUnauthorizedHandler } from "../api/client";
 
 export const AuthContext = createContext(null);
@@ -69,8 +69,24 @@ export function AuthProvider({ children }) {
     return res;
   }, []);
 
+  const register = useCallback(async (name, email, password) => {
+    setAuthError("");
+    const res = await apiRegister({ displayName: name, email, password });
+    const userData = {
+      email: res.email,
+      displayName: res.displayName,
+      role: res.role,
+    };
+    setUser(userData);
+    setToken(res.accessToken);
+    sessionStorage.setItem("auth_user", JSON.stringify(userData));
+    sessionStorage.setItem("auth_token", res.accessToken);
+    sessionStorage.setItem("auth_expires", res.expiresAt);
+    return res;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, token, authError, setAuthError, login, logout }}>
+    <AuthContext.Provider value={{ user, token, authError, setAuthError, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

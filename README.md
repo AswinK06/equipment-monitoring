@@ -91,6 +91,8 @@ The database automatically seeds two default accounts with distinct authorizatio
 | Admin | `admin@sustainabyte.local` | `AdminPassword123!` | Full permissions: create, edit, delete equipment, ingest HTTP readings, acknowledge and resolve alerts. |
 | Viewer | `viewer@sustainabyte.local` | `ViewerPassword123!` | Read-only permissions: view live equipment statuses, telemetry graphs, and active/resolved alerts. |
 
+Self-registered users are always Viewers. Admin accounts are seeded.
+
 ## REST API Reference
 
 All endpoints except authentication and health checks require an `Authorization: Bearer <token>` header.
@@ -98,6 +100,7 @@ All endpoints except authentication and health checks require an `Authorization:
 | Method | Path | Access | Description |
 |---|---|---|---|
 | POST | `/api/auth/login` | Anonymous | Authenticates credentials and returns JWT access token. |
+| POST | `/api/auth/register` | Anonymous | Registers a new viewer account and returns JWT access token. |
 | GET | `/api/auth/me` | Authenticated | Returns information about the authenticated user. |
 | GET | `/api/dashboard/summary` | Authenticated | Returns cached overall plant summary and equipment counts by status. |
 | GET | `/api/equipment` | Authenticated | Lists all monitored equipment records. |
@@ -207,3 +210,4 @@ npm test
 2. Historical Telemetry Partitioning: In large-scale deployments, PostgreSQL TimescaleDB or timescale hypertable partitioning is recommended for readings exceeding tens of millions of rows.
 3. Machine Learning Anomaly Detection: Current alerts use deterministic static thresholds. Adding statistical rolling-window anomaly models (e.g., z-score, Isolation Forest) would enable predictive maintenance before physical breaches occur.
 4. Granular User Management: User management is currently performed via seed scripts. An administrative management UI for creating and modifying user roles dynamically would be beneficial.
+5. The equipment list is not paginated; for large fleets add server-side filtering and paging.

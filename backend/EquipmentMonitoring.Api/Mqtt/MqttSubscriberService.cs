@@ -20,7 +20,11 @@ public class MqttSubscriberService(
     {
         var o = options.Value;
         using var client = new MqttFactory().CreateMqttClient();
-        client.ApplicationMessageReceivedAsync += e => HandleAsync(e, ct);
+        client.ApplicationMessageReceivedAsync += e =>
+        {
+            _ = Task.Run(() => HandleAsync(e, ct), ct);
+            return Task.CompletedTask;
+        };
 
         var connect = new MqttClientOptionsBuilder()
             .WithTcpServer(o.Host, o.Port)

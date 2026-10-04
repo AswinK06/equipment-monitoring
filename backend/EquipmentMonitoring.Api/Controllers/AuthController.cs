@@ -4,17 +4,25 @@ using EquipmentMonitoring.Api.Exceptions;
 using EquipmentMonitoring.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace EquipmentMonitoring.Api.Controllers;
 
 [ApiController, Route("api/auth")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
-    [HttpPost("login"), AllowAnonymous]
+    [HttpPost("login"), AllowAnonymous, EnableRateLimiting("auth")]
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken ct)
     {
         var response = await authService.LoginAsync(request.Email, request.Password, ct);
         return Ok(response);
+    }
+
+    [HttpPost("register"), AllowAnonymous, EnableRateLimiting("auth")]
+    public async Task<ActionResult<LoginResponse>> Register(RegisterRequest request, CancellationToken ct)
+    {
+        var response = await authService.RegisterAsync(request, ct);
+        return StatusCode(StatusCodes.Status201Created, response);
     }
 
     [HttpGet("me"), Authorize]

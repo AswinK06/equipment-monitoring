@@ -10,6 +10,7 @@ public class Equipment
     public string Location { get; set; } = "";
     public EquipmentStatus Status { get; set; }
     public DateOnly InstalledDate { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public List<Reading> Readings { get; set; } = new();
     public List<Alert> Alerts { get; set; } = new();
 }

@@ -8,5 +8,6 @@ public record EquipmentDto(
     string Type,
     string Location,
     EquipmentStatus Status,
-    DateOnly InstalledDate
+    DateOnly InstalledDate,
+    DateTime UpdatedAt
 );
