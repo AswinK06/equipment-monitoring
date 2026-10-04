@@ -33,7 +33,7 @@ An industrial IoT telemetry monitoring and alert management platform. It ingests
 
 Windows Notes:
 - Mosquitto can be installed using Windows installer or chocolatey (`choco install mosquitto`). Run with `mosquitto -c mosquitto/mosquitto.conf -v`.
-- Redis can be run via WSL (`sudo apt install redis-server && sudo service redis-server start`), native Memurai Developer Edition, or managed cloud instances (Upstash, Redis Cloud). If Redis is not running or unconfigured, the backend automatically uses an in-memory distributed cache fallback.
+- Redis can be run via WSL (`sudo apt install redis-server && sudo service redis-server start`), native Memurai Developer Edition, or managed cloud instances (Upstash, Redis Cloud). If Redis is not running or unconfigured, the backend automatically uses an in-memory distributed cache fallback. When Redis is enabled, connect/sync timeouts are set to 1000ms with `AbortOnConnectFail = false` to prevent API freezing during outages.
 - PostgreSQL can be installed via Windows installer with default port 5432 and postgres user.
 
 ## How to Run

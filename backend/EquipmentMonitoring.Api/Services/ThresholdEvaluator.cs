@@ -2,7 +2,7 @@ using EquipmentMonitoring.Api.Enums;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Pure alert rule: strictly above Max or strictly below Min is a breach. Equal to a limit is safe.</summary>
+// Rule: strictly above Max or strictly below Min is a breach. Equal to a limit is safe.
 public static class ThresholdEvaluator
 {
     public static Breach? Evaluate(double value, double? min, double? max)

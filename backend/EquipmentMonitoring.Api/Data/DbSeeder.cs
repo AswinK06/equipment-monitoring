@@ -1,20 +1,25 @@
 using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace EquipmentMonitoring.Api.Data;
 
 public static class DbSeeder
 {
-    /// <summary>Applies database migrations and seeds demo data when tables are empty.</summary>
-    public static async Task InitAsync(AppDbContext db, IConfiguration? config = null)
+    public static async Task InitAsync(AppDbContext db, IConfiguration config)
     {
         await db.Database.MigrateAsync();
 
         if (!await db.Users.AnyAsync())
         {
-            var adminPassword = config?["Seed:AdminPassword"] ?? "Admin@123456";
-            var viewerPassword = config?["Seed:ViewerPassword"] ?? "Viewer@123456";
+            var adminPassword = config["Seed:AdminPassword"];
+            var viewerPassword = config["Seed:ViewerPassword"];
+
+            if (string.IsNullOrWhiteSpace(adminPassword) || string.IsNullOrWhiteSpace(viewerPassword))
+            {
+                throw new InvalidOperationException("Seed:AdminPassword and Seed:ViewerPassword must be configured.");
+            }
 
             db.Users.AddRange(
                 new User

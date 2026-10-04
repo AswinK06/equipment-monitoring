@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Service implementing equipment CRUD operations with caching.</summary>
 public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipmentService
 {
     public async Task<IReadOnlyList<EquipmentDto>> ListAsync(CancellationToken ct)

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Service implementing alert status lifecycle (Open -> Acknowledged -> Resolved).</summary>
 public class AlertService(AppDbContext db, IRealtimeNotifier notifier, ICacheService cache) : IAlertService
 {
     public async Task<IReadOnlyList<AlertDto>> ListAsync(bool activeOnly, int? equipmentId, CancellationToken ct)
@@ -45,6 +44,7 @@ public class AlertService(AppDbContext db, IRealtimeNotifier notifier, ICacheSer
         return dto;
     }
 
+    // Allowed transitions: Open -> Acknowledged, Open/Acknowledged -> Resolved
     private static void ValidateStatusTransition(AlertStatus current, AlertStatus target)
     {
         if (current == AlertStatus.Resolved)

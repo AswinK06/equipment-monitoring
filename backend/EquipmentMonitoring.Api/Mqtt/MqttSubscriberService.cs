@@ -8,10 +8,6 @@ using MQTTnet.Client;
 
 namespace EquipmentMonitoring.Api.Mqtt;
 
-/// <summary>
-/// Subscribes to equipment/{id}/readings and hands each message to the same IReadingService the REST endpoint uses,
-/// so MQTT and HTTP ingestion share one persistence + alert + broadcast path. Reconnects every 5s if the broker drops.
-/// </summary>
 public class MqttSubscriberService(
     IOptions<MqttOptions> options,
     IServiceScopeFactory scopes,
@@ -32,6 +28,7 @@ public class MqttSubscriberService(
             .WithCleanSession()
             .Build();
 
+        // Reconnects every 5s if the MQTT broker drops
         while (!ct.IsCancellationRequested)
         {
             try

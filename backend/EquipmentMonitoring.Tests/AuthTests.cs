@@ -117,4 +117,28 @@ public class AuthTests
 
         Assert.Equal("Invalid email or password.", ex.Message);
     }
+
+    [Fact]
+    public async Task AuthService_GetCurrentUserAsync_returns_user_info_without_token()
+    {
+        using var db = CreateDbContext();
+        var tokenService = new TokenService(CreateConfig());
+        var authService = new AuthService(db, tokenService);
+
+        var user = new User
+        {
+            Email = "operator@sustainabyte.local",
+            DisplayName = "Operator",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
+            Role = UserRole.Viewer,
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        var res = await authService.GetCurrentUserAsync(user.Id, default);
+
+        Assert.Equal("operator@sustainabyte.local", res.Email);
+        Assert.Equal("Operator", res.DisplayName);
+        Assert.Equal("Viewer", res.Role);
+    }
 }

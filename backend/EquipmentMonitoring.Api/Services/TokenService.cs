@@ -7,7 +7,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Generates signed JWT tokens with user claims.</summary>
 public class TokenService(IConfiguration config) : ITokenService
 {
     public (string Token, DateTime ExpiresAt) GenerateToken(User user)

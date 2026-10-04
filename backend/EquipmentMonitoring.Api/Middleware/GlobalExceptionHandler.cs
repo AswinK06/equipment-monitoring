@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EquipmentMonitoring.Api.Middleware;
 
-/// <summary>Maps domain exceptions to RFC 7807 problem responses so every endpoint fails the same way.</summary>
 public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext ctx, Exception ex, CancellationToken ct)

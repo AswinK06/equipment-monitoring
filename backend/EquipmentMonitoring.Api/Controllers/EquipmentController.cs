@@ -1,3 +1,4 @@
+using EquipmentMonitoring.Api.Constants;
 using EquipmentMonitoring.Api.Dtos;
 using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Services.Interfaces;
@@ -39,7 +40,6 @@ public class EquipmentController(
         return NoContent();
     }
 
-    /// <summary>Historical readings, oldest first. Filter with ?from=&amp;to= (ISO 8601), ?metric=, ?limit= (default 200, max 5000).</summary>
     [HttpGet("{id:int}/readings")]
     public async Task<ActionResult<IReadOnlyList<ReadingDto>>> History(
         int id,

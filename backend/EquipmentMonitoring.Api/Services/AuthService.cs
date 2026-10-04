@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Validates user credentials against database records and issues JWT tokens.</summary>
 public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthService
 {
     private const string InvalidCredentialsMessage = "Invalid email or password.";
@@ -25,12 +24,11 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         return new LoginResponse(token, expiresAt, user.Email, user.DisplayName, user.Role.ToString());
     }
 
-    public async Task<LoginResponse> GetCurrentUserAsync(int userId, CancellationToken ct)
+    public async Task<UserInfoResponse> GetCurrentUserAsync(int userId, CancellationToken ct)
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct)
             ?? throw new NotFoundException($"User {userId} was not found.");
 
-        var (token, expiresAt) = tokenService.GenerateToken(user);
-        return new LoginResponse(token, expiresAt, user.Email, user.DisplayName, user.Role.ToString());
+        return new UserInfoResponse(user.Email, user.DisplayName, user.Role.ToString());
     }
 }

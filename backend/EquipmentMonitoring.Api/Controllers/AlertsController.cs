@@ -1,3 +1,4 @@
+using EquipmentMonitoring.Api.Constants;
 using EquipmentMonitoring.Api.Dtos;
 using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Services.Interfaces;
@@ -9,7 +10,6 @@ namespace EquipmentMonitoring.Api.Controllers;
 [ApiController, Route("api/alerts"), Authorize]
 public class AlertsController(IAlertService alerts) : ControllerBase
 {
-    /// <summary>GET /api/alerts?activeOnly=true lists Open + Acknowledged alerts.</summary>
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<AlertDto>>> List(
         [FromQuery] bool activeOnly = false,

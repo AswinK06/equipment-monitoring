@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Service implementing sensor reading ingestion, alert threshold evaluation, and historical queries.</summary>
 public class ReadingService(AppDbContext db, IRealtimeNotifier notifier, ICacheService cache) : IReadingService
 {
     public static DateTime AsUtc(DateTime d) => d.Kind switch
@@ -122,6 +121,7 @@ public class ReadingService(AppDbContext db, IRealtimeNotifier notifier, ICacheS
             var breach = ThresholdEvaluator.Evaluate(value, t.Min, t.Max);
             if (breach is null) continue;
 
+            // At most one unresolved alert per equipment + metric + breach direction
             var alreadyUnresolved = unresolved.Concat(newAlerts)
                 .Any(a => a.Metric == input.Metric && a.Kind == breach.Kind);
             if (alreadyUnresolved) continue;

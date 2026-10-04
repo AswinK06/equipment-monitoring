@@ -18,7 +18,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpGet("me"), Authorize]
-    public async Task<ActionResult<LoginResponse>> Me(CancellationToken ct)
+    public async Task<ActionResult<UserInfoResponse>> Me(CancellationToken ct)
     {
         var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
         if (string.IsNullOrEmpty(sub) || !int.TryParse(sub, out var userId))
