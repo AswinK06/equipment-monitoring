@@ -11,11 +11,17 @@ export function useSignalR({ onReadingsReceived, onAlertTriggered, onAlertUpdate
   });
 
   useEffect(() => {
+    if (!accessTokenFactory) {
+      setIsLive(false);
+      return;
+    }
+
     let isCancelled = false;
+    let retryTimeoutId = null;
 
     const builder = new signalR.HubConnectionBuilder()
       .withUrl(`${API}/hubs/equipment`, {
-        accessTokenFactory: accessTokenFactory || undefined,
+        accessTokenFactory,
       })
       .withAutomaticReconnect();
 
@@ -41,14 +47,16 @@ export function useSignalR({ onReadingsReceived, onAlertTriggered, onAlertUpdate
         await connection.start();
         if (!isCancelled) setIsLive(true);
       } catch {
-        if (!isCancelled) setTimeout(startConnection, 3000);
+        if (!isCancelled) {
+          retryTimeoutId = setTimeout(startConnection, 3000);
+        }
       }
     };
 
     connection.onclose(() => {
       if (!isCancelled) {
         setIsLive(false);
-        setTimeout(startConnection, 3000);
+        retryTimeoutId = setTimeout(startConnection, 3000);
       }
     });
 
@@ -56,6 +64,7 @@ export function useSignalR({ onReadingsReceived, onAlertTriggered, onAlertUpdate
 
     return () => {
       isCancelled = true;
+      if (retryTimeoutId) clearTimeout(retryTimeoutId);
       connection.stop();
     };
   }, [accessTokenFactory]);

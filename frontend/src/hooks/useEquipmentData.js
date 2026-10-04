@@ -58,8 +58,14 @@ export function useEquipmentData(accessTokenFactory) {
   });
 
   const loadAll = useCallback(async () => {
+    if (!accessTokenFactory) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
+      setError(null);
       const [eq, al] = await Promise.all([getEquipment(), getAlerts()]);
       const hist = await Promise.all(eq.map((e) => getReadings(e.id, 200)));
 
@@ -74,7 +80,7 @@ export function useEquipmentData(accessTokenFactory) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [accessTokenFactory]);
 
   useEffect(() => {
     loadAll();
