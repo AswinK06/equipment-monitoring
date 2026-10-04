@@ -8,16 +8,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EquipmentMonitoring.Api.Services;
 
-/// <summary>Service implementing equipment CRUD operations.</summary>
-public class EquipmentService(AppDbContext db) : IEquipmentService
+/// <summary>Service implementing equipment CRUD operations with caching.</summary>
+public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipmentService
 {
-    public async Task<IReadOnlyList<EquipmentDto>> ListAsync(CancellationToken ct) =>
-        (await db.Equipment.AsNoTracking().OrderBy(e => e.Id).ToListAsync(ct))
-        .Select(e => e.ToDto())
-        .ToList();
+    public async Task<IReadOnlyList<EquipmentDto>> ListAsync(CancellationToken ct)
+    {
+        var cached = await cache.GetAsync<IReadOnlyList<EquipmentDto>>(CacheKeys.EquipmentList);
+        if (cached != null) return cached;
 
-    public async Task<EquipmentDto> GetAsync(int id, CancellationToken ct) =>
-        (await FindAsync(id, ct)).ToDto();
+        var list = (await db.Equipment.AsNoTracking().OrderBy(e => e.Id).ToListAsync(ct))
+            .Select(e => e.ToDto())
+            .ToList();
+
+        await cache.SetAsync(CacheKeys.EquipmentList, list, TimeSpan.FromSeconds(60));
+        return list;
+    }
+
+    public async Task<EquipmentDto> GetAsync(int id, CancellationToken ct)
+    {
+        var key = CacheKeys.EquipmentById(id);
+        var cached = await cache.GetAsync<EquipmentDto>(key);
+        if (cached != null) return cached;
+
+        var dto = (await FindAsync(id, ct)).ToDto();
+        await cache.SetAsync(key, dto, TimeSpan.FromSeconds(60));
+        return dto;
+    }
 
     public async Task<EquipmentDto> CreateAsync(EquipmentRequest r, CancellationToken ct)
     {
@@ -25,6 +41,7 @@ public class EquipmentService(AppDbContext db) : IEquipmentService
         Apply(e, r);
         db.Equipment.Add(e);
         await db.SaveChangesAsync(ct);
+        await InvalidateCacheAsync(e.Id);
         return e.ToDto();
     }
 
@@ -33,6 +50,7 @@ public class EquipmentService(AppDbContext db) : IEquipmentService
         var e = await FindAsync(id, ct);
         Apply(e, r);
         await db.SaveChangesAsync(ct);
+        await InvalidateCacheAsync(id);
         return e.ToDto();
     }
 
@@ -41,6 +59,14 @@ public class EquipmentService(AppDbContext db) : IEquipmentService
         var e = await FindAsync(id, ct);
         db.Equipment.Remove(e);
         await db.SaveChangesAsync(ct);
+        await InvalidateCacheAsync(id);
+    }
+
+    private async Task InvalidateCacheAsync(int id)
+    {
+        await cache.RemoveAsync(CacheKeys.EquipmentList);
+        await cache.RemoveAsync(CacheKeys.EquipmentById(id));
+        await cache.RemoveAsync(CacheKeys.DashboardSummary);
     }
 
     private async Task<Equipment> FindAsync(int id, CancellationToken ct) =>

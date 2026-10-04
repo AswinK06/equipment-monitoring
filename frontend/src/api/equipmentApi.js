@@ -4,6 +4,10 @@ export async function getEquipment() {
   return api("/api/equipment");
 }
 
+export async function getDashboardSummary() {
+  return api("/api/dashboard/summary");
+}
+
 export async function getEquipmentById(id) {
   return api(`/api/equipment/${id}`);
 }

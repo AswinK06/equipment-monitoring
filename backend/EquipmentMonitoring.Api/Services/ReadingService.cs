@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EquipmentMonitoring.Api.Services;
 
 /// <summary>Service implementing sensor reading ingestion, alert threshold evaluation, and historical queries.</summary>
-public class ReadingService(AppDbContext db, IRealtimeNotifier notifier) : IReadingService
+public class ReadingService(AppDbContext db, IRealtimeNotifier notifier, ICacheService cache) : IReadingService
 {
     public static DateTime AsUtc(DateTime d) => d.Kind switch
     {
@@ -32,6 +32,11 @@ public class ReadingService(AppDbContext db, IRealtimeNotifier notifier) : IRead
 
         db.Alerts.AddRange(newAlerts);
         await db.SaveChangesAsync(ct);
+
+        if (newAlerts.Count > 0)
+        {
+            await cache.RemoveAsync(CacheKeys.DashboardSummary);
+        }
 
         var alertDtos = newAlerts.Select(a => a.ToDto()).ToList();
         await SendLiveUpdatesAsync(equipmentId, request.Readings, alertDtos, ts);

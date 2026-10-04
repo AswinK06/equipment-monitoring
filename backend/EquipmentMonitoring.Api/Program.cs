@@ -130,6 +130,23 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+// Cache configuration: Redis if connection string is provided, otherwise in-memory distributed cache
+var redisConn = cfg["Redis:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(redisConn))
+{
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.Configuration = redisConn;
+        o.InstanceName = "EquipmentMonitoring:";
+    });
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
+
+builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
 builder.Services.AddScoped<IReadingService, ReadingService>();
 builder.Services.AddScoped<IAlertService, AlertService>();
@@ -148,6 +165,11 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p => p
     .AllowCredentials()));
 
 var app = builder.Build();
+
+if (string.IsNullOrWhiteSpace(redisConn))
+{
+    app.Logger.LogInformation("Redis not configured, using in-memory cache");
+}
 
 using (var scope = app.Services.CreateScope())
 {

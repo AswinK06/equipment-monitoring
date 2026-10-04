@@ -32,6 +32,18 @@ If the API listens on a different port, update `NEXT_PUBLIC_API_URL`. Allowed br
 | Admin | `admin@sustainabyte.local` | `Admin123!` | Full access: add/edit/delete equipment, ingest readings, acknowledge/resolve alerts |
 | Viewer | `viewer@sustainabyte.local` | `Viewer123!` | Read-only access: view dashboard, equipment details, live metrics and alerts |
 
+## Redis Caching (Optional)
+The system uses Redis distributed caching for equipment lists, single equipment lookups (60s TTL), and the dashboard summary (15s TTL).
+
+Configuration key: `Redis:ConnectionString` in `appsettings.json` (or environment variable `Redis__ConnectionString`).
+
+Three ways to run Redis on Windows:
+1. **WSL**: `sudo apt install redis-server && sudo service redis-server start`
+2. **Memurai**: Install Memurai Developer Edition for native Windows Redis compatibility.
+3. **Cloud**: Use a free managed Redis instance (e.g., Upstash or Redis Cloud).
+
+**Works without Redis**: If `Redis:ConnectionString` is empty or omitted, the application automatically falls back to ASP.NET Core in-memory distributed cache (`AddDistributedMemoryCache`) and continues operating seamlessly.
+
 
 ## Database: migrations and seed
 On startup `DbSeeder` runs `Migrate()` if migrations exist, otherwise `EnsureCreated()`, then seeds demo data once (only when the Equipment table is empty). To use real migrations:

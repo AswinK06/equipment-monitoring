@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EquipmentMonitoring.Api.Services;
 
 /// <summary>Service implementing alert status lifecycle (Open -> Acknowledged -> Resolved).</summary>
-public class AlertService(AppDbContext db, IRealtimeNotifier notifier) : IAlertService
+public class AlertService(AppDbContext db, IRealtimeNotifier notifier, ICacheService cache) : IAlertService
 {
     public async Task<IReadOnlyList<AlertDto>> ListAsync(bool activeOnly, int? equipmentId, CancellationToken ct)
     {
@@ -38,6 +38,7 @@ public class AlertService(AppDbContext db, IRealtimeNotifier notifier) : IAlertS
         }
 
         await db.SaveChangesAsync(ct);
+        await cache.RemoveAsync(CacheKeys.DashboardSummary);
 
         var dto = a.ToDto();
         await notifier.AlertUpdatedAsync(dto);
