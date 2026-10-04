@@ -7,10 +7,34 @@ namespace EquipmentMonitoring.Api.Data;
 public static class DbSeeder
 {
     /// <summary>Applies migrations (or creates the schema if none exist yet) and seeds demo data once.</summary>
-    public static async Task InitAsync(AppDbContext db)
+    public static async Task InitAsync(AppDbContext db, IConfiguration? config = null)
     {
         if (db.Database.GetMigrations().Any()) await db.Database.MigrateAsync();
         else await db.Database.EnsureCreatedAsync();
+
+        if (!await db.Users.AnyAsync())
+        {
+            var adminPassword = config?["Seed:AdminPassword"] ?? "Admin@123456";
+            var viewerPassword = config?["Seed:ViewerPassword"] ?? "Viewer@123456";
+
+            db.Users.AddRange(
+                new User
+                {
+                    Email = "admin@sustainabyte.local",
+                    DisplayName = "Plant Administrator",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+                    Role = UserRole.Admin,
+                },
+                new User
+                {
+                    Email = "viewer@sustainabyte.local",
+                    DisplayName = "Operations Observer",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(viewerPassword),
+                    Role = UserRole.Viewer,
+                }
+            );
+            await db.SaveChangesAsync();
+        }
 
         if (await db.Equipment.AnyAsync()) return;
 

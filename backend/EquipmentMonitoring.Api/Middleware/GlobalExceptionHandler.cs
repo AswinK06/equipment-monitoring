@@ -11,6 +11,7 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log) : IExce
     {
         var (code, title) = ex switch
         {
+            UnauthorizedException => (401, "Unauthorized"),
             NotFoundException => (404, "Not found"),
             ConflictException => (409, "Conflict"),
             BadRequestException => (400, "Bad request"),

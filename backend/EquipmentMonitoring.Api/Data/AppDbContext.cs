@@ -9,9 +9,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Reading> Readings => Set<Reading>();
     public DbSet<Alert> Alerts => Set<Alert>();
     public DbSet<Threshold> Thresholds => Set<Threshold>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        b.Entity<User>(e =>
+        {
+            e.Property(x => x.Email).HasMaxLength(120).IsRequired();
+            e.HasIndex(x => x.Email).IsUnique();
+            e.Property(x => x.DisplayName).HasMaxLength(100).IsRequired();
+            e.Property(x => x.PasswordHash).IsRequired();
+            e.Property(x => x.Role).HasConversion<string>().HasMaxLength(30);
+        });
+
         b.Entity<Equipment>(e =>
         {
             e.Property(x => x.Name).HasMaxLength(120).IsRequired();

@@ -1,10 +1,12 @@
 using EquipmentMonitoring.Api.Dtos;
+using EquipmentMonitoring.Api.Enums;
 using EquipmentMonitoring.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EquipmentMonitoring.Api.Controllers;
 
-[ApiController, Route("api/equipment")]
+[ApiController, Route("api/equipment"), Authorize]
 public class EquipmentController(
     IEquipmentService equipment,
     IReadingService readings,
@@ -19,18 +21,18 @@ public class EquipmentController(
     public async Task<ActionResult<EquipmentDto>> Get(int id, CancellationToken ct) =>
         Ok(await equipment.GetAsync(id, ct));
 
-    [HttpPost]
+    [HttpPost, Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<EquipmentDto>> Create(EquipmentRequest request, CancellationToken ct)
     {
         var created = await equipment.CreateAsync(request, ct);
         return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
     }
 
-    [HttpPut("{id:int}")]
+    [HttpPut("{id:int}"), Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<EquipmentDto>> Update(int id, EquipmentRequest request, CancellationToken ct) =>
         Ok(await equipment.UpdateAsync(id, request, ct));
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete("{id:int}"), Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id, CancellationToken ct)
     {
         await equipment.DeleteAsync(id, ct);
@@ -48,7 +50,7 @@ public class EquipmentController(
         CancellationToken ct = default
     ) => Ok(await readings.HistoryAsync(id, from, to, metric, limit, ct));
 
-    [HttpPost("{id:int}/readings")]
+    [HttpPost("{id:int}/readings"), Authorize(Roles = Roles.Admin)]
     public async Task<ActionResult<IngestResult>> Ingest(int id, IngestRequest request, CancellationToken ct) =>
         Accepted(await readings.IngestAsync(id, request, ct));
 
