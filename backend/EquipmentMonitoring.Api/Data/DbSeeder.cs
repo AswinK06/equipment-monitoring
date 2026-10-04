@@ -6,11 +6,10 @@ namespace EquipmentMonitoring.Api.Data;
 
 public static class DbSeeder
 {
-    /// <summary>Applies migrations (or creates the schema if none exist yet) and seeds demo data once.</summary>
+    /// <summary>Applies database migrations and seeds demo data when tables are empty.</summary>
     public static async Task InitAsync(AppDbContext db, IConfiguration? config = null)
     {
-        if (db.Database.GetMigrations().Any()) await db.Database.MigrateAsync();
-        else await db.Database.EnsureCreatedAsync();
+        await db.Database.MigrateAsync();
 
         if (!await db.Users.AnyAsync())
         {
