@@ -1,10 +1,18 @@
-import { Activity, Bell, LayoutGrid, Radio } from "lucide-react";
+import { Activity, Bell, LayoutGrid, LogOut, Radio, User as UserIcon } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navbar({ activePage, alertCount = 0, isLive = false, onNavigate }) {
+  const { user, logout } = useAuth();
+
   const tabs = [
     { id: "dashboard", label: "Equipment", icon: LayoutGrid },
     { id: "alerts", label: "Active alerts", icon: Bell, badge: alertCount },
   ];
+
+  const roleBadgeStyle =
+    user?.role === "Admin"
+      ? "bg-brand-mint text-brand-navy font-bold"
+      : "bg-slate-200 text-slate-700 font-semibold";
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-brand-navy shadow-md">
@@ -53,10 +61,33 @@ export default function Navbar({ activePage, alertCount = 0, isLive = false, onN
           })}
         </nav>
 
-        {/* Live indicator */}
-        <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 ring-1 ring-white/10">
-          <Radio size={14} className={isLive ? "text-emerald-400 animate-pulse" : "text-red-400"} />
-          <span className="hidden sm:inline">{isLive ? "Live" : "Reconnecting…"}</span>
+        {/* Right side: Live status, user badge, logout */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 ring-1 ring-white/10">
+            <Radio size={14} className={isLive ? "text-emerald-400 animate-pulse" : "text-red-400"} />
+            <span>{isLive ? "Live" : "Reconnecting…"}</span>
+          </div>
+
+          {user && (
+            <div className="flex items-center gap-2 border-l border-white/10 pl-3">
+              <div className="hidden md:flex flex-col text-right">
+                <span className="text-xs font-semibold text-white">{user.email}</span>
+                <span className="text-[10px] text-slate-400">{user.displayName}</span>
+              </div>
+              <span className={`rounded-md px-2 py-0.5 text-[10px] uppercase tracking-wider ${roleBadgeStyle}`}>
+                {user.role}
+              </span>
+              <button
+                type="button"
+                onClick={() => logout()}
+                title="Sign out"
+                aria-label="Sign out"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -26,6 +26,13 @@ cd frontend && npm install && cp .env.example .env.local && npm run dev
 ```
 If the API listens on a different port, update `NEXT_PUBLIC_API_URL`. Allowed browser origins are set in `Cors:Origins`.
 
+## Demo accounts
+| Role | Email | Password | Permissions |
+|---|---|---|---|
+| Admin | `admin@sustainabyte.local` | `Admin123!` | Full access: add/edit/delete equipment, ingest readings, acknowledge/resolve alerts |
+| Viewer | `viewer@sustainabyte.local` | `Viewer123!` | Read-only access: view dashboard, equipment details, live metrics and alerts |
+
+
 ## Database: migrations and seed
 On startup `DbSeeder` runs `Migrate()` if migrations exist, otherwise `EnsureCreated()`, then seeds demo data once (only when the Equipment table is empty). To use real migrations:
 ```bash

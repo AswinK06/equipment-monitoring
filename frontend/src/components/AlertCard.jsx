@@ -1,7 +1,12 @@
+import { useAuth } from "../hooks/useAuth";
+import { isAdmin } from "../utils/roles";
 import Button from "./Button";
 import StatusBadge from "./StatusBadge";
 
 export default function AlertCard({ alert, equipmentName, onAcknowledge, onResolve, onOpen }) {
+  const { user } = useAuth();
+  const canAct = isAdmin(user);
+
   const isOpen = alert.status === "Open";
   const isAck = alert.status === "Acknowledged";
 
@@ -37,26 +42,28 @@ export default function AlertCard({ alert, equipmentName, onAcknowledge, onResol
           <p className="text-[11px] text-slate-400">Triggered at {alert.time || alert.createdAt}</p>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {isOpen && (
-            <Button
-              variant="secondary"
-              onClick={() => onAcknowledge?.(alert.id)}
-              className="text-xs py-1.5 px-3"
-            >
-              Acknowledge
-            </Button>
-          )}
-          {(isOpen || isAck) && (
-            <Button
-              variant="primary"
-              onClick={() => onResolve?.(alert.id)}
-              className="text-xs py-1.5 px-3"
-            >
-              Resolve
-            </Button>
-          )}
-        </div>
+        {canAct && (
+          <div className="flex items-center gap-2 shrink-0">
+            {isOpen && (
+              <Button
+                variant="secondary"
+                onClick={() => onAcknowledge?.(alert.id)}
+                className="text-xs py-1.5 px-3"
+              >
+                Acknowledge
+              </Button>
+            )}
+            {(isOpen || isAck) && (
+              <Button
+                variant="primary"
+                onClick={() => onResolve?.(alert.id)}
+                className="text-xs py-1.5 px-3"
+              >
+                Resolve
+              </Button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

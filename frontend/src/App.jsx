@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "./hooks/useAuth";
 import { useEquipmentData } from "./hooks/useEquipmentData";
 import { STATUSES } from "./constants/statuses";
 import Navbar from "./components/Navbar";
@@ -8,11 +9,20 @@ import ErrorMessage from "./components/ErrorMessage";
 import DashboardPage from "./pages/DashboardPage";
 import EquipmentDetailPage from "./pages/EquipmentDetailPage";
 import AlertsPage from "./pages/AlertsPage";
+import LoginPage from "./pages/LoginPage";
 
 export default function App() {
-  const { db, live, loading, error, setAlert, save } = useEquipmentData();
+  const { user, token } = useAuth();
+  const { db, live, loading, error, setAlert, save } = useEquipmentData(
+    token ? () => token : null
+  );
+
   const [page, setPage] = useState("dashboard"); // "dashboard" | "detail" | "alerts"
   const [selectedId, setSelectedId] = useState(null);
+
+  if (!user) {
+    return <LoginPage />;
+  }
 
   const openAlerts = db.alerts.filter((a) => a.status !== "Resolved");
   const counts = Object.fromEntries(

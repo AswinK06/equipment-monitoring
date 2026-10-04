@@ -1,9 +1,14 @@
 import { Pencil } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
+import { isAdmin } from "../utils/roles";
 import StatusBadge from "./StatusBadge";
 import AlertCountBadge from "./AlertCountBadge";
 import MetricValue from "./MetricValue";
 
 export default function EquipmentRow({ item, latestReading = {}, alertCount = 0, onSelect, onEdit }) {
+  const { user } = useAuth();
+  const canEdit = isAdmin(user);
+
   return (
     <tr
       onClick={() => onSelect(item.id)}
@@ -33,14 +38,16 @@ export default function EquipmentRow({ item, latestReading = {}, alertCount = 0,
         className="px-4 py-3.5 text-right"
         onClick={(e) => e.stopPropagation()}
       >
-        <button
-          type="button"
-          onClick={() => onEdit(item)}
-          aria-label={`Edit ${item.name}`}
-          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-navy transition-all"
-        >
-          <Pencil size={15} />
-        </button>
+        {canEdit && (
+          <button
+            type="button"
+            onClick={() => onEdit(item)}
+            aria-label={`Edit ${item.name}`}
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-brand-navy transition-all"
+          >
+            <Pencil size={15} />
+          </button>
+        )}
       </td>
     </tr>
   );
