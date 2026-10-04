@@ -1,8 +1,8 @@
 import { Pencil, Trash2 } from "lucide-react";
-import StatusBadge from "./StatusBadge";
-import AlertCountBadge from "./AlertCountBadge";
-import MetricValue from "./MetricValue";
-import { formatRelativeTime } from "../utils/format";
+import StatusBadge from "../ui/StatusBadge";
+import AlertCountBadge from "../ui/AlertCountBadge";
+import MetricValue from "../ui/MetricValue";
+import { formatRelativeTime } from "../../utils/format";
 
 export default function EquipmentRow({
   item,

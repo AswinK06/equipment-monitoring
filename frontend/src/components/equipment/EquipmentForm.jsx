@@ -1,8 +1,8 @@
 import { useState } from "react";
-import Modal from "./Modal";
-import FormField from "./FormField";
-import Button from "./Button";
-import { STATUSES } from "../constants/statuses";
+import Modal from "../ui/Modal";
+import FormField from "../ui/FormField";
+import Button from "../ui/Button";
+import { STATUSES } from "../../constants/statuses";
 
 export default function EquipmentForm({ item, onSave, onClose }) {
   const [form, setForm] = useState({

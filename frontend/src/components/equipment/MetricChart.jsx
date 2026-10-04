@@ -8,8 +8,8 @@ import {
   ReferenceLine,
   CartesianGrid,
 } from "recharts";
-import { LIMITS, UNITS } from "../constants/metrics";
-import { formatNumber } from "../utils/format";
+import { LIMITS, UNITS } from "../../constants/metrics";
+import { formatNumber } from "../../utils/format";
 
 export default function MetricChart({ data = [], metric = "temperature" }) {
   const limit = LIMITS[metric];

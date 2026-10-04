@@ -57,6 +57,8 @@ const readingsSlice = createSlice({
 
 export const { readingsReceived } = readingsSlice.actions;
 
+export const selectReadingsMap = (state) => state.readings.byEquipmentId;
+
 export const selectReadingsByEquipment = (idOrState, maybeId) => {
   if (maybeId !== undefined) {
     return idOrState.readings.byEquipmentId[maybeId] || [];

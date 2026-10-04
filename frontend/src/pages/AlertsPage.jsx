@@ -1,10 +1,12 @@
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import PageHeader from "../components/PageHeader";
-import AlertCard from "../components/AlertCard";
-import Card from "../components/Card";
-import EmptyState from "../components/EmptyState";
-import StatusBadge from "../components/StatusBadge";
+import { useNavigate } from "react-router-dom";
+import { useQueryParam } from "../hooks/useQueryParam";
+import PageHeader from "../components/ui/PageHeader";
+import Card from "../components/ui/Card";
+import EmptyState from "../components/ui/EmptyState";
+import AlertCard from "../components/alerts/AlertCard";
+import AlertFilterTabs from "../components/alerts/AlertFilterTabs";
+import ResolvedAlertsList from "../components/alerts/ResolvedAlertsList";
 import {
   selectAllAlerts,
   selectActiveAlerts,
@@ -13,30 +15,14 @@ import {
 } from "../store/slices/alertsSlice";
 import { selectAllEquipment } from "../store/slices/equipmentSlice";
 
-export default function AlertsPage({
-  onAcknowledge,
-  onResolve,
-  onSelectEquipment,
-}) {
+export default function AlertsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [statusFilter, setStatusFilter] = useQueryParam("status");
 
   const activeAlerts = useSelector(selectActiveAlerts);
   const allAlerts = useSelector(selectAllAlerts);
   const equipment = useSelector(selectAllEquipment);
-
-  const statusFilter = searchParams.get("status");
-
-  const handleFilterClick = (status) => {
-    const next = Object.fromEntries(searchParams.entries());
-    if (!status || status === "All" || statusFilter === status) {
-      delete next.status;
-    } else {
-      next.status = status;
-    }
-    setSearchParams(next);
-  };
 
   const filteredAlerts = statusFilter
     ? activeAlerts.filter((a) => a.status === statusFilter)
@@ -46,30 +32,6 @@ export default function AlertsPage({
   const resolvedAlerts = allAlerts
     .filter((a) => a.status === "Resolved")
     .slice(0, 5);
-
-  const handleAcknowledge = (id) => {
-    if (onAcknowledge) {
-      onAcknowledge(id);
-    } else {
-      dispatch(acknowledgeAlert(id));
-    }
-  };
-
-  const handleResolve = (id) => {
-    if (onResolve) {
-      onResolve(id);
-    } else {
-      dispatch(resolveAlert(id));
-    }
-  };
-
-  const handleSelectEquipment = (eqId) => {
-    if (onSelectEquipment) {
-      onSelectEquipment(eqId);
-    } else {
-      navigate(`/equipment/${eqId}`);
-    }
-  };
 
   return (
     <div className="space-y-8">
@@ -84,26 +46,10 @@ export default function AlertsPage({
         title="Unresolved Breaches"
         description={`Active threshold violations (${filteredAlerts.length})`}
         actions={
-          <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
-            {["All", "Open", "Acknowledged"].map((status) => {
-              const isSelected =
-                (status === "All" && !statusFilter) || statusFilter === status;
-              return (
-                <button
-                  key={status}
-                  type="button"
-                  onClick={() => handleFilterClick(status === "All" ? null : status)}
-                  className={`rounded-lg px-4 py-1.5 text-xs font-bold transition-all ${
-                    isSelected
-                      ? "bg-white text-brand-navy shadow-sm"
-                      : "text-slate-600 hover:text-brand-navy"
-                  }`}
-                >
-                  {status}
-                </button>
-              );
-            })}
-          </div>
+          <AlertFilterTabs
+            selectedStatus={statusFilter}
+            onSelectStatus={setStatusFilter}
+          />
         }
       >
         <div className="p-6">
@@ -116,9 +62,9 @@ export default function AlertsPage({
                   key={alert.id}
                   alert={alert}
                   equipmentName={eqMap[alert.equipmentId]}
-                  onAcknowledge={handleAcknowledge}
-                  onResolve={handleResolve}
-                  onOpen={handleSelectEquipment}
+                  onAcknowledge={(id) => dispatch(acknowledgeAlert(id))}
+                  onResolve={(id) => dispatch(resolveAlert(id))}
+                  onOpen={(eqId) => navigate(`/equipment/${eqId}`)}
                 />
               ))}
             </div>
@@ -126,36 +72,7 @@ export default function AlertsPage({
         </div>
       </Card>
 
-      {resolvedAlerts.length > 0 && (
-        <Card
-          title="Recently Resolved Incidents"
-          description="Last 5 resolved threshold breach events"
-        >
-          <div className="divide-y divide-slate-100">
-            {resolvedAlerts.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center justify-between p-6 text-sm transition-colors hover:bg-slate-50"
-              >
-                <div>
-                  <span className="font-bold text-brand-navy">
-                    {eqMap[a.equipmentId] || `Unit #${a.equipmentId}`}
-                  </span>
-                  <span className="mx-2 text-slate-300">·</span>
-                  <span className="text-slate-600">
-                    {a.metric} {a.kind === "Max" || a.kind === 1 ? "exceeded" : "breached"}{" "}
-                    (measured: {a.value}, threshold: {a.threshold})
-                  </span>
-                  <div className="text-xs text-slate-400 mt-1">
-                    Resolved at {a.time || a.resolvedAt || a.createdAt}
-                  </div>
-                </div>
-                <StatusBadge status={a.status} />
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
+      <ResolvedAlertsList alerts={resolvedAlerts} equipmentMap={eqMap} />
     </div>
   );
 }

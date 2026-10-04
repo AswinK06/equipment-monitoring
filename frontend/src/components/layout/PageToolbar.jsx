@@ -1,5 +1,5 @@
 import { Menu } from "lucide-react";
-import LiveIndicator from "./LiveIndicator";
+import LiveIndicator from "../ui/LiveIndicator";
 import UserBadge from "./UserBadge";
 
 export default function PageToolbar({ isLive = false, onMenuClick, user }) {

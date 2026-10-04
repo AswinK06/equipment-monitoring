@@ -1,7 +1,7 @@
-import { useAuth } from "../hooks/useAuth";
-import { isAdmin } from "../utils/roles";
-import Button from "./Button";
-import StatusBadge from "./StatusBadge";
+import { useAuth } from "../../hooks/useAuth";
+import { isAdmin } from "../../utils/roles";
+import Button from "../ui/Button";
+import StatusBadge from "../ui/StatusBadge";
 
 export default function AlertCard({ alert, equipmentName, onAcknowledge, onResolve, onOpen }) {
   const { user } = useAuth();

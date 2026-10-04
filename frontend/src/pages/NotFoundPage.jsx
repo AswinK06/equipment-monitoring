@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft, AlertTriangle } from "lucide-react";
-import Button from "../components/Button";
+import Button from "../components/ui/Button";
 
 export default function NotFoundPage() {
   return (

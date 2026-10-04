@@ -1,5 +1,5 @@
-import { LIMITS, UNITS } from "../constants/metrics";
-import { formatNumber } from "../utils/format";
+import { LIMITS, UNITS } from "../../constants/metrics";
+import { formatNumber } from "../../utils/format";
 
 export default function MetricValue({ metric, value }) {
   const limit = LIMITS[metric];

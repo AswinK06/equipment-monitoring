@@ -1,16 +1,16 @@
 import { useEffect, useCallback, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuth } from "../hooks/useAuth";
-import { useSignalR } from "../hooks/useSignalR";
-import { fetchEquipment } from "../store/slices/equipmentSlice";
-import { fetchAlerts, alertReceived, alertUpdated, toAlert } from "../store/slices/alertsSlice";
-import { fetchReadings, readingsReceived } from "../store/slices/readingsSlice";
+import { useAuth } from "../../hooks/useAuth";
+import { useSignalR } from "../../hooks/useSignalR";
+import { fetchEquipment } from "../../store/slices/equipmentSlice";
+import { fetchAlerts, alertReceived, alertUpdated, toAlert } from "../../store/slices/alertsSlice";
+import { fetchReadings, readingsReceived } from "../../store/slices/readingsSlice";
 import Sidebar from "./Sidebar";
 import PageToolbar from "./PageToolbar";
 import Footer from "./Footer";
-import Loading from "./Loading";
-import ErrorMessage from "./ErrorMessage";
+import Loading from "../ui/Loading";
+import ErrorMessage from "../ui/ErrorMessage";
 
 export default function AppLayout() {
   const { token, user } = useAuth();

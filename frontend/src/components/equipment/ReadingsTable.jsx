@@ -1,5 +1,5 @@
-import MetricValue from "./MetricValue";
-import EmptyState from "./EmptyState";
+import MetricValue from "../ui/MetricValue";
+import EmptyState from "../ui/EmptyState";
 
 export default function ReadingsTable({ rows = [], bordered = false }) {
   if (rows.length === 0) {

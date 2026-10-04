@@ -1,8 +1,8 @@
 import { Activity, ChevronsLeft, ChevronsRight, LogOut } from "lucide-react";
 import { useSelector } from "react-redux";
-import { useAuth } from "../hooks/useAuth";
-import { selectActiveAlerts } from "../store/slices/alertsSlice";
-import { navigationItems } from "../constants/navigation";
+import { useAuth } from "../../hooks/useAuth";
+import { selectActiveAlerts } from "../../store/slices/alertsSlice";
+import { NAVIGATION_ITEMS } from "../../constants/navigation";
 import SidebarItem from "./SidebarItem";
 
 export default function Sidebar({
@@ -54,7 +54,7 @@ export default function Sidebar({
 
       {/* Middle: Navigation Items */}
       <nav className="flex-1 space-y-1.5 px-3 py-2 overflow-y-auto">
-        {navigationItems.map((item) => {
+        {NAVIGATION_ITEMS.map((item) => {
           const badge = item.to === "/alerts" ? activeAlertCount : 0;
           return (
             <SidebarItem

@@ -1,7 +1,7 @@
-import { useAuth } from "../hooks/useAuth";
-import { isAdmin } from "../utils/roles";
+import { useAuth } from "../../hooks/useAuth";
+import { isAdmin } from "../../utils/roles";
 import EquipmentRow from "./EquipmentRow";
-import EmptyState from "./EmptyState";
+import EmptyState from "../ui/EmptyState";
 
 export default function EquipmentTable({
   equipment = [],

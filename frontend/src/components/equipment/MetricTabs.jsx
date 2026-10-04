@@ -1,5 +1,5 @@
-import { METRIC_NAMES } from "../constants/metrics";
-import MetricValue from "./MetricValue";
+import { METRIC_NAMES } from "../../constants/metrics";
+import MetricValue from "../ui/MetricValue";
 
 export default function MetricTabs({ latest = {}, selectedMetric, onSelect }) {
   return (

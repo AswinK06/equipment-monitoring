@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useNavigate, useLocation, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import AuthLayout from "../components/AuthLayout";
-import FormField from "../components/FormField";
-import PasswordInput from "../components/PasswordInput";
-import Button from "../components/Button";
-import ErrorMessage from "../components/ErrorMessage";
+import AuthLayout from "../components/layout/AuthLayout";
+import FormField from "../components/ui/FormField";
+import PasswordInput from "../components/ui/PasswordInput";
+import Button from "../components/ui/Button";
+import ErrorMessage from "../components/ui/ErrorMessage";
 
 export default function LoginPage() {
   const { token, login, authError } = useAuth();

@@ -1,30 +1,19 @@
 import { useState } from "react";
 import { useNavigate, Link, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import AuthLayout from "../components/AuthLayout";
-import FormField from "../components/FormField";
-import PasswordInput from "../components/PasswordInput";
-import Button from "../components/Button";
-import ErrorMessage from "../components/ErrorMessage";
+import { validateRegistration } from "../utils/validation";
+import AuthLayout from "../components/layout/AuthLayout";
+import FormField from "../components/ui/FormField";
+import PasswordInput from "../components/ui/PasswordInput";
+import Button from "../components/ui/Button";
+import ErrorMessage from "../components/ui/ErrorMessage";
 
 export default function RegisterPage() {
   const { token, register, authError } = useAuth();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
+  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+  const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -32,49 +21,16 @@ export default function RegisterPage() {
     return <Navigate to="/" replace />;
   }
 
-  const validate = () => {
-    const nextErrors = {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    };
-    let isValid = true;
-
-    if (!form.name.trim() || form.name.trim().length < 2) {
-      nextErrors.name = "Name must be at least 2 characters.";
-      isValid = false;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!form.email.trim() || !emailRegex.test(form.email.trim())) {
-      nextErrors.email = "Please enter a valid email address.";
-      isValid = false;
-    }
-
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    if (!passwordRegex.test(form.password)) {
-      nextErrors.password =
-        "Password must be at least 8 characters and contain a letter and a number.";
-      isValid = false;
-    }
-
-    if (form.password !== form.confirmPassword) {
-      nextErrors.confirmPassword = "Passwords do not match.";
-      isValid = false;
-    }
-
-    setErrors(nextErrors);
-    return isValid;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError("");
 
-    if (!validate()) {
+    const validationErrors = validateRegistration(form);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+    setErrors({});
 
     try {
       setLoading(true);
@@ -136,9 +92,7 @@ export default function RegisterPage() {
             placeholder="••••••••"
             required
           />
-          <p className="mt-1 text-xs text-slate-400">
-            At least 8 characters, with a letter and a number
-          </p>
+          <p className="mt-1 text-xs text-slate-400">At least 8 characters, with a letter and a number</p>
         </FormField>
 
         <FormField label="Confirm password" error={errors.confirmPassword}>
@@ -151,17 +105,10 @@ export default function RegisterPage() {
           />
         </FormField>
 
-        {(serverError || authError) && (
-          <ErrorMessage message={serverError || authError} />
-        )}
+        {(serverError || authError) && <ErrorMessage message={serverError || authError} />}
 
         <div className="pt-2">
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={loading}
-            className="w-full h-11 text-sm font-bold"
-          >
+          <Button type="submit" variant="primary" disabled={loading} className="w-full h-11 text-sm font-bold">
             {loading ? "Creating account..." : "Create account"}
           </Button>
         </div>

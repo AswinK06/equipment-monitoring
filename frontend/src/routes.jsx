@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import AppLayout from "./components/AppLayout";
-import ProtectedRoute from "./components/ProtectedRoute";
+import AppLayout from "./components/layout/AppLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import EquipmentDetailPage from "./pages/EquipmentDetailPage";
 import AlertsPage from "./pages/AlertsPage";

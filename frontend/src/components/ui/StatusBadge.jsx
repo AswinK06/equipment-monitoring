@@ -1,4 +1,4 @@
-import { STATUS_COLORS } from "../constants/statuses";
+import { STATUS_COLORS } from "../../constants/statuses";
 
 export default function StatusBadge({ status }) {
   const fallback = {

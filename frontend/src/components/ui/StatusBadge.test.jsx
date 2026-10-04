@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import StatusBadge from "./StatusBadge";
-import { STATUSES } from "../constants/statuses";
+import { STATUSES } from "../../constants/statuses";
 
 describe("StatusBadge", () => {
   STATUSES.forEach((status) => {

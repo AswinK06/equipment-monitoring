@@ -1,6 +1,6 @@
 import { LayoutGrid, Bell } from "lucide-react";
 
-export const navigationItems = [
+export const NAVIGATION_ITEMS = [
   {
     label: "Equipment",
     to: "/",

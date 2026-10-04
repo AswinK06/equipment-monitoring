@@ -1,5 +1,5 @@
-import StatusBadge from "./StatusBadge";
-import EmptyState from "./EmptyState";
+import StatusBadge from "../ui/StatusBadge";
+import EmptyState from "../ui/EmptyState";
 
 export default function AlertHistoryList({ alerts = [] }) {
   if (alerts.length === 0) {
