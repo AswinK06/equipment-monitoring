@@ -1,13 +1,42 @@
-import { Activity, Bell, LayoutGrid, LogOut, Radio, User as UserIcon } from "lucide-react";
+import { Activity, Bell, LayoutGrid, LogOut, Radio } from "lucide-react";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { selectActiveAlerts } from "../store/slices/alertsSlice";
 
-export default function Navbar({ activePage, alertCount = 0, isLive = false, onNavigate }) {
+export default function Navbar({ activePage, alertCount, isLive = false, onNavigate }) {
   const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const activeAlerts = useSelector(selectActiveAlerts);
+  const badgeCount = alertCount !== undefined ? alertCount : (activeAlerts ? activeAlerts.length : 0);
 
   const tabs = [
-    { id: "dashboard", label: "Equipment", icon: LayoutGrid },
-    { id: "alerts", label: "Active alerts", icon: Bell, badge: alertCount },
+    { id: "dashboard", path: "/", label: "Equipment", icon: LayoutGrid },
+    { id: "alerts", path: "/alerts", label: "Active alerts", icon: Bell, badge: badgeCount },
   ];
+
+  const handleNavigate = (tab) => {
+    if (onNavigate) {
+      onNavigate(tab.id);
+    } else {
+      navigate(tab.path);
+    }
+  };
+
+  const isTabActive = (tab) => {
+    if (activePage) {
+      return activePage === tab.id || (tab.id === "dashboard" && activePage === "detail");
+    }
+    if (tab.id === "dashboard") {
+      return location.pathname === "/" || location.pathname.startsWith("/equipment");
+    }
+    if (tab.id === "alerts") {
+      return location.pathname.startsWith("/alerts");
+    }
+    return false;
+  };
 
   const roleBadgeStyle =
     user?.role === "Admin"
@@ -33,12 +62,12 @@ export default function Navbar({ activePage, alertCount = 0, isLive = false, onN
         <nav className="flex items-center gap-1 sm:gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activePage === tab.id || (tab.id === "dashboard" && activePage === "detail");
+            const isActive = isTabActive(tab);
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => onNavigate(tab.id)}
+                onClick={() => handleNavigate(tab)}
                 className={`relative flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
                   isActive ? "text-brand-mint" : "text-slate-300 hover:bg-white/5 hover:text-white"
                 }`}

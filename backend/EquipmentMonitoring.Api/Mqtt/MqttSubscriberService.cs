@@ -19,7 +19,7 @@ public class MqttSubscriberService(
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         var o = options.Value;
-        var client = new MqttFactory().CreateMqttClient();
+        using var client = new MqttFactory().CreateMqttClient();
         client.ApplicationMessageReceivedAsync += e => HandleAsync(e, ct);
 
         var connect = new MqttClientOptionsBuilder()
@@ -28,29 +28,52 @@ public class MqttSubscriberService(
             .WithCleanSession()
             .Build();
 
-        // Reconnects every 5s if the MQTT broker drops
-        while (!ct.IsCancellationRequested)
+        try
         {
-            try
+            // Reconnects every 5s if the MQTT broker drops
+            while (!ct.IsCancellationRequested)
             {
-                if (!client.IsConnected)
+                try
                 {
-                    await client.ConnectAsync(connect, ct);
-                    await client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(o.Topic).Build(), ct);
-                    log.LogInformation("MQTT connected to {Host}:{Port}, subscribed to {Topic}", o.Host, o.Port, o.Topic);
+                    if (!client.IsConnected)
+                    {
+                        await client.ConnectAsync(connect, ct);
+                        await client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(o.Topic).Build(), ct);
+                        log.LogInformation("MQTT connected to {Host}:{Port}, subscribed to {Topic}", o.Host, o.Port, o.Topic);
+                    }
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    log.LogWarning("MQTT connection failed ({Message}); retrying in 5s", ex.Message);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(5), ct);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Host is shutting down
+        }
+        finally
+        {
+            if (client.IsConnected)
+            {
+                try
+                {
+                    await client.DisconnectAsync(new MqttClientDisconnectOptions(), CancellationToken.None);
+                }
+                catch
+                {
+                    // Ignore disconnect failures during host shutdown
                 }
             }
-            catch (Exception ex) when (ex is not OperationCanceledException)
-            {
-                log.LogWarning("MQTT connection failed ({Message}); retrying in 5s", ex.Message);
-            }
-
-            await Task.Delay(TimeSpan.FromSeconds(5), ct);
         }
     }
 
     private async Task HandleAsync(MqttApplicationMessageReceivedEventArgs e, CancellationToken ct)
     {
+        if (ct.IsCancellationRequested) return;
+
         try
         {
             var parts = e.ApplicationMessage.Topic.Split('/');
@@ -68,9 +91,19 @@ public class MqttSubscriberService(
                 return;
             }
 
+            if (ct.IsCancellationRequested) return;
+
             using var scope = scopes.CreateScope();
             var readingService = scope.ServiceProvider.GetRequiredService<IReadingService>();
             await readingService.IngestAsync(equipmentId, request, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // Host cancellation in flight
+        }
+        catch (ObjectDisposedException) when (ct.IsCancellationRequested)
+        {
+            // Host service provider has been disposed during shutdown
         }
         catch (NotFoundException ex)
         {
@@ -78,6 +111,7 @@ public class MqttSubscriberService(
         }
         catch (Exception ex)
         {
+            if (ct.IsCancellationRequested) return;
             log.LogError(ex, "Failed to process MQTT message");
         }
     }

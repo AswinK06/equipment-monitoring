@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import FormField from "../components/FormField";
 import Button from "../components/Button";
@@ -6,11 +7,19 @@ import ErrorMessage from "../components/ErrorMessage";
 import { Activity } from "lucide-react";
 
 export default function LoginPage() {
-  const { login, authError } = useAuth();
+  const { token, login, authError } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [localError, setLocalError] = useState("");
+
+  const destination = location.state?.from?.pathname || "/";
+
+  if (token) {
+    return <Navigate to={destination} replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,6 +32,7 @@ export default function LoginPage() {
       setLocalError("");
       setLoading(true);
       await login(email, password);
+      navigate(destination, { replace: true });
     } catch (err) {
       setLocalError(err.message || "Failed to sign in.");
     } finally {

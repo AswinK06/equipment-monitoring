@@ -1,46 +1,79 @@
 import { useState } from "react";
+import { useParams, useSearchParams, Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { isAdmin } from "../utils/roles";
 import StatusBadge from "../components/StatusBadge";
 import Button from "../components/Button";
+import Loading from "../components/Loading";
 import MetricTabs from "../components/MetricTabs";
 import MetricChart from "../components/MetricChart";
 import ReadingsTable from "../components/ReadingsTable";
 import AlertHistoryList from "../components/AlertHistoryList";
 import EquipmentForm from "../components/EquipmentForm";
+import { selectEquipmentById, saveEquipment } from "../store/slices/equipmentSlice";
+import { selectReadingsByEquipment, selectLatestReading } from "../store/slices/readingsSlice";
+import { selectAlertsByEquipment } from "../store/slices/alertsSlice";
 
-export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
+export default function EquipmentDetailPage({ id: propId, onBack, onSave }) {
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const { id: paramId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const equipmentId = propId !== undefined ? propId : paramId;
+  const metric = searchParams.get("metric") || "temperature";
+
+  const loading = useSelector((state) => state.equipment.loading);
+  const equipment = useSelector(selectEquipmentById(equipmentId));
+  const history = useSelector(selectReadingsByEquipment(equipmentId));
+  const latest = useSelector(selectLatestReading(equipmentId));
+  const alertHistory = useSelector(selectAlertsByEquipment(equipmentId));
+
   const canEdit = isAdmin(user);
-  const [metric, setMetric] = useState("temperature");
   const [isEditing, setIsEditing] = useState(false);
 
-  const equipment = db.equipment.find((x) => x.id === id);
+  const handleSelectMetric = (m) => {
+    const next = Object.fromEntries(searchParams.entries());
+    next.metric = m;
+    setSearchParams(next);
+  };
+
+  const handleSaveEquipment = async (item) => {
+    if (onSave) {
+      await onSave(item);
+    } else {
+      await dispatch(saveEquipment(item)).unwrap();
+    }
+  };
+
+  if (loading) {
+    return <Loading text="Loading industrial equipment fleet…" />;
+  }
+
   if (!equipment) {
     return (
       <div className="text-center py-12">
         <p className="text-slate-500 mb-4">Equipment not found.</p>
-        <Button variant="secondary" onClick={onBack}>
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
+        >
           <ArrowLeft size={16} /> Back to fleet
-        </Button>
+        </Link>
       </div>
     );
   }
 
-  const history = db.readings[id] || [];
-  const latest = history.at(-1) || {};
-  const alertHistory = db.alerts.filter((a) => a.equipmentId === id);
-
   return (
     <div className="space-y-6">
-      <button
-        type="button"
-        onClick={onBack}
+      <Link
+        to="/"
         className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-brand-navy transition-colors"
       >
         <ArrowLeft size={16} /> Back to all equipment
-      </button>
+      </Link>
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         <div>
@@ -64,7 +97,7 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
         </div>
       </div>
 
-      <MetricTabs latest={latest} selectedMetric={metric} onSelect={setMetric} />
+      <MetricTabs latest={latest} selectedMetric={metric} onSelect={handleSelectMetric} />
 
       <MetricChart data={history} metric={metric} />
 
@@ -94,7 +127,7 @@ export default function EquipmentDetailPage({ db, id, onBack, onSave }) {
         <EquipmentForm
           item={equipment}
           onClose={() => setIsEditing(false)}
-          onSave={onSave}
+          onSave={handleSaveEquipment}
         />
       )}
     </div>

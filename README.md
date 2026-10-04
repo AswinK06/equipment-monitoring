@@ -180,6 +180,14 @@ equipment-monitoring/
 `-- README.md
 ```
 
+## Frontend state
+
+Application state is managed globally using Redux Toolkit.
+The centralized store combines three distinct feature slices:
+- equipment: Equipment catalog items, loading status, and error states.
+- alerts: Active and resolved anomaly breach alerts with deduplication.
+- readings: Rolling telemetry history by equipment ID (buffered up to 60 samples).
+
 ## Running the Tests
 
 To run the backend test suite (19 xUnit tests covering authentication, threshold logic, cache resilience, and alert lifecycles):
