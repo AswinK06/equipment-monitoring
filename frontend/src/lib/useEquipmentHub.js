@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useState } from "react";
 import * as signalR from "@microsoft/signalr";
 import { API, api } from "./api";

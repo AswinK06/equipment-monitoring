@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import { useEquipmentHub } from "../lib/useEquipmentHub";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine, CartesianGrid } from "recharts";

@@ -7,6 +7,7 @@ build/
 .cache/
 
 # Environment files
+.env
 .env.local
 .env.*.local
 *.local
