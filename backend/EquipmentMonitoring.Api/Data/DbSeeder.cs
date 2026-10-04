@@ -59,13 +59,14 @@ public static class DbSeeder
             await db.SaveChangesAsync();
         }
 
-        if (!await db.Readings.AnyAsync())
-        {
-            var now = DateTime.UtcNow;
-            var equipmentList = await db.Equipment.ToListAsync();
-            var initialReadings = new List<Reading>();
+        var equipmentList = await db.Equipment.ToListAsync();
+        var initialReadings = new List<Reading>();
+        var now = DateTime.UtcNow;
 
-            foreach (var eq in equipmentList)
+        foreach (var eq in equipmentList)
+        {
+            var hasReadings = await db.Readings.AnyAsync(r => r.EquipmentId == eq.Id);
+            if (!hasReadings)
             {
                 var baseTemp = eq.Status == EquipmentStatus.Faulty ? 92.4 : eq.Status == EquipmentStatus.Idle ? 26.5 : 74.5;
                 var baseVib = eq.Status == EquipmentStatus.Faulty ? 7.8 : eq.Status == EquipmentStatus.Idle ? 0.08 : 3.4;
@@ -82,12 +83,12 @@ public static class DbSeeder
                     initialReadings.Add(new Reading { EquipmentId = eq.Id, Metric = "runtime", Value = Math.Round(baseRuntime + (10 - i) * 0.03, 3), Unit = "h", Timestamp = ts });
                 }
             }
+        }
 
-            if (initialReadings.Count > 0)
-            {
-                db.Readings.AddRange(initialReadings);
-                await db.SaveChangesAsync();
-            }
+        if (initialReadings.Count > 0)
+        {
+            db.Readings.AddRange(initialReadings);
+            await db.SaveChangesAsync();
         }
 
         if (!await db.Alerts.AnyAsync())

@@ -48,12 +48,12 @@ dotnet run
 API runs at http://localhost:5000 (Swagger available at http://localhost:5000/swagger). Database migrations and initial seed data are applied automatically on startup.
 
 3. Start the Industrial Telemetry Simulator:
-```bash
+```powershell
 cd simulator
 npm install
-npm start
+$env:SIM_EMAIL="viewer@sustainabyte.local"; $env:SIM_PASSWORD="ViewerPassword123!"; npm start
 ```
-The simulator connects to Mosquitto at localhost:1883 and publishes sensor readings every 2 seconds for monitored machines.
+The simulator dynamically authenticates with the backend API, discovers all registered machines, and broadcasts live MQTT telemetry packets every 2 seconds.
 
 4. Start the Frontend Dashboard:
 ```bash
@@ -84,17 +84,30 @@ The following configuration settings are defined in `backend/EquipmentMonitoring
 
 ### Simulator Environment Variables
 
-The IoT simulator (`simulator/simulator.js`) supports the following environment variables:
+The IoT simulator (`simulator/simulator.js`) requires valid credentials to authenticate with the backend API and discover monitored machines:
 
-| Variable | Default | Description |
+| Variable | Required? | Default Value | Description |
+|---|---|---|---|
+| `SIM_EMAIL` | **Yes** | — | Viewer or Admin user email for API authentication. |
+| `SIM_PASSWORD` | **Yes** | — | User password for API authentication. |
+| `API_BASE` | Optional | `http://localhost:5000` | Backend REST API base URL. |
+| `MQTT_URL` | Optional | `mqtt://localhost:1883` | Mosquitto broker connection URL. |
+| `INTERVAL_MS` | Optional | `2000` | Telemetry broadcast interval in milliseconds. |
+| `SYNC_INTERVAL_MS` | Optional | `30000` | Inventory refresh interval in milliseconds. |
+
+**PowerShell Execution Example:**
+```powershell
+$env:SIM_EMAIL="viewer@sustainabyte.local"; $env:SIM_PASSWORD="ViewerPassword123!"; npm start
+```
+
+### Telemetry Rules per Status
+
+| Equipment Status | Telemetry Behavior | Runtime Counter |
 |---|---|---|
-| `MQTT_URL` | `mqtt://localhost:1883` | Mosquitto broker connection URL. |
-| `API_BASE` | `http://localhost:5000` | Backend REST API base URL. |
-| `AUTO_DISCOVER` | `false` | When `true`, automatically syncs monitored inventory from API. |
-| `SIM_EMAIL` | — | User email for API inventory polling when `AUTO_DISCOVER=true`. |
-| `SIM_PASSWORD` | — | User password for API inventory polling when `AUTO_DISCOVER=true`. |
-| `INTERVAL_MS` | `2000` | Telemetry broadcast interval in milliseconds. |
-| `EQUIPMENT_IDS`| `1,2,3,4` | Fallback equipment IDs when auto-discovery is disabled. |
+| `Active` | Normal profile values by machine type with slight jitter and 3% operational spike probability. | Increases continuously. |
+| `Faulty` | Abnormally elevated values (temperature +14°C, vibration +2.5 mm/s) triggering threshold breach alerts. | Increases continuously. |
+| `Idle` | Low resting baseline (temp ~28°C, vib ~0.1 mm/s, pressure ~40 psi staying above 30 psi limit). | Stationary (does not increase). |
+| `UnderMaintenance` | No telemetry messages published (paused). | Stationary (does not increase). |
 
 ## Demo Accounts
 
@@ -211,7 +224,10 @@ equipment-monitoring/
 |-- mosquitto/
 |   `-- mosquitto.conf            # Mosquitto broker listener and security configuration
 |-- simulator/
-|   |-- simulator.js              # IoT sensor telemetry generator with dynamic discovery
+|   |-- config.js                 # Environment configuration and validation
+|   |-- apiClient.js              # Authenticated REST API client with auto-reauth
+|   |-- telemetry.js              # Type-based telemetry generators (pure functions)
+|   |-- simulator.js              # Main background loop and MQTT publisher
 |   `-- package.json
 `-- README.md
 ```

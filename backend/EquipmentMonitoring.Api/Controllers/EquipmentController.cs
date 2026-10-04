@@ -18,10 +18,6 @@ public class EquipmentController(
     public async Task<ActionResult<IReadOnlyList<EquipmentDto>>> List(CancellationToken ct) =>
         Ok(await equipment.ListAsync(ct));
 
-    [HttpGet("inventory"), AllowAnonymous]
-    public async Task<ActionResult<IReadOnlyList<EquipmentDto>>> Inventory(CancellationToken ct) =>
-        Ok(await equipment.ListAsync(ct));
-
     [HttpGet("{id:int}")]
     public async Task<ActionResult<EquipmentDto>> Get(int id, CancellationToken ct) =>
         Ok(await equipment.GetAsync(id, ct));
