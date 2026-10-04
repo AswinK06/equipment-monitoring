@@ -49,7 +49,7 @@ export default function Sidebar({ collapsed = false, onToggle, onCloseMobile }) 
       </div>
 
       {/* Middle: Navigation Items */}
-      <nav className="flex-1 space-y-1.5 px-3 py-2 overflow-y-auto">
+      <nav className="flex-1 space-y-1.5 px-3 py-2">
         {NAVIGATION_ITEMS.map((item) => {
           const badge = item.to === "/alerts" ? activeAlertCount : 0;
           return (

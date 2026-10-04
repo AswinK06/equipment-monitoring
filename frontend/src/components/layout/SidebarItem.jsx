@@ -72,7 +72,7 @@ export default function SidebarItem({
             )}
 
             {collapsed && (
-              <div className="absolute left-full ml-3 hidden rounded-lg bg-brand-navy2 px-2.5 py-1 text-xs font-semibold text-white shadow-xl ring-1 ring-white/10 group-hover:block z-50 whitespace-nowrap pointer-events-none">
+              <div className="absolute left-full ml-3 hidden rounded-lg bg-brand-navy2 px-2.5 py-1 text-xs font-semibold text-white shadow-xl ring-1 ring-white/10 group-hover:block z-50 whitespace-nowrap pointer-events-none top-1/2 -translate-y-1/2">
                 <div className="flex items-center gap-2">
                   <span>{label}</span>
                   {badge > 0 && (
