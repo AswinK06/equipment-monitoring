@@ -9,4 +9,6 @@ public interface IAuthService
     Task<LoginResponse> RegisterAsync(RegisterRequest request, CancellationToken ct);
 
     Task<UserInfoResponse> GetCurrentUserAsync(int userId, CancellationToken ct);
+ 
+    Task<LogoutResponse> LogoutAsync(int userId, CancellationToken ct);
 }

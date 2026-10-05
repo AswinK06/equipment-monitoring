@@ -1,5 +1,5 @@
 import { createContext, useCallback, useEffect, useState } from "react";
-import { login as apiLogin, register as apiRegister } from "../api/authApi";
+import { login as apiLogin, register as apiRegister, logout as apiLogout } from "../api/authApi";
 import { setUnauthorizedHandler } from "../api/client";
 
 export const AuthContext = createContext(null);
@@ -21,6 +21,9 @@ export function AuthProvider({ children }) {
   const [authError, setAuthError] = useState("");
 
   const logout = useCallback((reason = "") => {
+    if (!reason && sessionStorage.getItem("auth_token")) {
+      apiLogout().catch(() => {});
+    }
     setUser(null);
     setToken(null);
     sessionStorage.removeItem("auth_user");

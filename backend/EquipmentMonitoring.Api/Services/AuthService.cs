@@ -63,6 +63,14 @@ public class AuthService(AppDbContext db, ITokenService tokenService) : IAuthSer
         return new UserInfoResponse(user.Email, user.DisplayName, user.Role.ToString());
     }
 
+    public async Task<LogoutResponse> LogoutAsync(int userId, CancellationToken ct)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct)
+            ?? throw new NotFoundException($"User {userId} was not found.");
+
+        return new LogoutResponse($"User '{user.Email}' logged out successfully.");
+    }
+
     private LoginResponse BuildLoginResponse(User user)
     {
         var (token, expiresAt) = tokenService.GenerateToken(user);

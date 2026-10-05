@@ -226,4 +226,40 @@ public class AuthTests
         Assert.NotNull(roleClaim);
         Assert.Equal("Viewer", roleClaim.Value);
     }
+
+    [Fact]
+    public async Task AuthService_LogoutAsync_existing_user_returns_success_message()
+    {
+        using var db = CreateDbContext();
+        var tokenService = new TokenService(CreateConfig());
+        var authService = new AuthService(db, tokenService);
+
+        var user = new User
+        {
+            Email = "operator@sustainabyte.local",
+            DisplayName = "Operator",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Password123!"),
+            Role = UserRole.Viewer,
+        };
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        var res = await authService.LogoutAsync(user.Id, default);
+
+        Assert.NotNull(res);
+        Assert.Contains("operator@sustainabyte.local", res.Message);
+        Assert.Contains("logged out successfully", res.Message);
+    }
+
+    [Fact]
+    public async Task AuthService_LogoutAsync_unknown_user_throws_NotFoundException()
+    {
+        using var db = CreateDbContext();
+        var tokenService = new TokenService(CreateConfig());
+        var authService = new AuthService(db, tokenService);
+
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            authService.LogoutAsync(999, default)
+        );
+    }
 }

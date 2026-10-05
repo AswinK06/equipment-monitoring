@@ -54,12 +54,13 @@ public class EquipmentService(AppDbContext db, ICacheService cache) : IEquipment
         return e.ToDto();
     }
 
-    public async Task DeleteAsync(int id, CancellationToken ct)
+    public async Task<DeleteEquipmentResponse> DeleteAsync(int id, CancellationToken ct)
     {
         var e = await FindAsync(id, ct);
         db.Equipment.Remove(e);
         await db.SaveChangesAsync(ct);
         await InvalidateCacheAsync(id);
+        return new DeleteEquipmentResponse(id, $"Equipment '{e.Name}' (ID: {id}) deleted successfully.");
     }
 
     private async Task InvalidateCacheAsync(int id)

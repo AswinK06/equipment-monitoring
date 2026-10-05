@@ -37,4 +37,17 @@ public class AuthController(IAuthService authService) : ControllerBase
         var user = await authService.GetCurrentUserAsync(userId, ct);
         return Ok(user);
     }
+
+    [HttpPost("logout"), Authorize]
+    public async Task<ActionResult<LogoutResponse>> Logout(CancellationToken ct)
+    {
+        var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+        if (string.IsNullOrEmpty(sub) || !int.TryParse(sub, out var userId))
+        {
+            throw new UnauthorizedException("Invalid token claims.");
+        }
+
+        var response = await authService.LogoutAsync(userId, ct);
+        return Ok(response);
+    }
 }

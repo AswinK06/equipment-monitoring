@@ -34,10 +34,10 @@ public class EquipmentController(
         Ok(await equipment.UpdateAsync(id, request, ct));
 
     [HttpDelete("{id:int}"), Authorize(Roles = Roles.Admin)]
-    public async Task<IActionResult> Delete(int id, CancellationToken ct)
+    public async Task<ActionResult<DeleteEquipmentResponse>> Delete(int id, CancellationToken ct)
     {
-        await equipment.DeleteAsync(id, ct);
-        return NoContent();
+        var result = await equipment.DeleteAsync(id, ct);
+        return Ok(result);
     }
 
     [HttpGet("{id:int}/readings")]

@@ -195,7 +195,12 @@ public class EquipmentServiceTests
         db.Equipment.Add(eq);
         await db.SaveChangesAsync();
 
-        await service.DeleteAsync(1, CancellationToken.None);
+        var result = await service.DeleteAsync(1, CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal(1, result.Id);
+        Assert.Contains("Equipment 1", result.Message);
+        Assert.Contains("deleted successfully", result.Message);
 
         var entity = await db.Equipment.FindAsync(1);
         Assert.Null(entity);

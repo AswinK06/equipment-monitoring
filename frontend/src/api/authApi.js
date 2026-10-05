@@ -17,3 +17,9 @@ export async function register(payload) {
 export async function getMe() {
   return api("/api/auth/me");
 }
+
+export async function logout() {
+  return api("/api/auth/logout", {
+    method: "POST",
+  });
+}
